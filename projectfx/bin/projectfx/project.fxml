@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.text.Font?>
+
+<StackPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" stylesheets="@style.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="projectfx.Controller">
+   <children>
+      <AnchorPane prefHeight="200.0" prefWidth="200.0">
+         <children>
+            <AnchorPane prefHeight="403.0" prefWidth="236.0" />
+            <AnchorPane layoutX="236.0" prefHeight="400.0" prefWidth="367.0" style="-fx-background-color: #d7cacac5;">
+               <children>
+                  <Label layoutX="124.0" layoutY="79.0" text="Welcome back!">
+                     <font>
+                        <Font name="Bodoni MT Black" size="20.0" />
+                     </font>
+                  </Label>
+                  <TextField layoutX="105.0" layoutY="156.0" prefHeight="25.0" prefWidth="191.0" promptText="Type your name" />
+                  <Label layoutX="104.0" layoutY="133.0" text="Your Name">
+                     <font>
+                        <Font name="Century Gothic" size="13.0" />
+                     </font>
+                  </Label>
+                  <Button id="join" layoutX="80.0" layoutY="225.0" mnemonicParsing="false" styleClass="login-btns" text="Join team" />
+                  <Button id="create" layoutX="211.0" layoutY="225.0" mnemonicParsing="false" styleClass="login-btns" text="Create a team" />
+               </children>
+            </AnchorPane>
+         </children>
+      </AnchorPane>
+   </children>
+</StackPane>
