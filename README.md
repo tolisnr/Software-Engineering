@@ -1,6 +1,8 @@
-# Software-Engineering
-Software Engineering project for the course "Software Engineering"
-
-Download the libraries from "https://gluonhq.com/products/javafx/" <br>
-Unzip the folder <br>
-Copy the lib folder into the lib folder of the JavaFX project <br>
+<b>This is a new branch for the back-end requirements of the app</b>
+<br>
+<h1>Team members: </h1>
+<ul>
+<li>Olga Saridou</li>
+<li>Eleni Tsotsou</li>
+<li>Athina Papachatzi</li>
+</ul>
