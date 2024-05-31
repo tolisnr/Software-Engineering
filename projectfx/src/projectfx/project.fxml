@@ -11,15 +11,15 @@
    <children>
       <AnchorPane prefHeight="200.0" prefWidth="200.0">
          <children>
-            <AnchorPane prefHeight="403.0" prefWidth="236.0" />
-            <AnchorPane layoutX="236.0" prefHeight="400.0" prefWidth="367.0" style="-fx-background-color: #d7cacac5;">
+            <AnchorPane id="first-anch" prefHeight="400.0" prefWidth="236.0" styleClass="anchorpane" />
+            <AnchorPane id="second-anch" layoutX="236.0" prefHeight="400.0" prefWidth="367.0" styleClass="anchorpane">
                <children>
                   <Label layoutX="124.0" layoutY="79.0" text="Welcome back!">
                      <font>
                         <Font name="Bodoni MT Black" size="20.0" />
                      </font>
                   </Label>
-                  <TextField layoutX="105.0" layoutY="156.0" prefHeight="25.0" prefWidth="191.0" promptText="Type your name" />
+                  <TextField id="name-field" layoutX="105.0" layoutY="156.0" prefHeight="25.0" prefWidth="191.0" promptText="Type your name" />
                   <Label layoutX="104.0" layoutY="133.0" text="Your Name">
                      <font>
                         <Font name="Century Gothic" size="13.0" />
