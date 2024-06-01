@@ -1,16 +1,29 @@
 package projectfx;
 
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
+import javafx.scene.image.ImageView;
 
 public class Controller {
 
     @FXML
-    private Label label;
+    private Button create;
+
+    @FXML
+    private Button join;
+
+    @FXML
+    private TextField namefield;
+
+    @FXML
+    private ImageView back_img;
+
+    public void join_team() {}
+
+    public void create_team() {}
 
     public void initialize() {
-        String javaVersion = System.getProperty("java.version");
-        String javafxVersion = System.getProperty("javafx.version");
-        label.setText("Hello, JavaFX " + javafxVersion + "\nRunning on Java " + javaVersion + ".");
     }
 }

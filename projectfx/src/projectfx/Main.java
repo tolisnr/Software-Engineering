@@ -12,8 +12,9 @@ public class Main extends Application {
     public void start(Stage primaryStage) throws Exception {
         Parent root = FXMLLoader.load(getClass().getResource("project.fxml"));
         primaryStage.setTitle("BudgetBuddy Project");
-        //root.getStylesheets().add(getClass().getResource("style.css").toExternalForm());
-        primaryStage.setScene(new Scene(root, 400, 600));
+        primaryStage.getIcons().add(new javafx.scene.image.Image("file:src/images/icon.jpeg"));
+        primaryStage.setScene(new Scene(root, 600, 400));
+        primaryStage.setResizable(false);
         primaryStage.show();
     }
 
