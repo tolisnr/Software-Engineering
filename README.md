@@ -6,3 +6,11 @@
 <li>Apostolos Sinioris</li>
 <li>Stefanos Paraskevoudis</li>
 </ul>
+
+<hr>
+For this project to work: <br>
+<ol>
+<li>Clone the whole project in a .zip folder</li>
+<li>Rename the "vscode" folder to ".vscode"</li>
+<li>Copy the libraries to the lib folder of the project</li>
+</ol>
