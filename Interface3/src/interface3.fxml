@@ -36,12 +36,12 @@
                      </font>
                   </Label>
                   <TextField id="namefield" fx:id="namefield" layoutX="207.0" layoutY="126.0" prefHeight="27.0" prefWidth="183.0" promptText="Type your name" />
-                  <Label layoutX="213.0" layoutY="190.0" prefHeight="20.0" prefWidth="101.0" text="Your password:">
+                  <Label layoutX="213.0" layoutY="190.0" prefHeight="20.0" prefWidth="110.0" text="Your password:">
                      <font>
-                        <Font size="14.0" />
+                        <Font name="Century Gothic" size="14.0" />
                      </font>
                   </Label>
-                  <PasswordField id="passwordfield" fx:id="passwordfield" layoutX="207.0" layoutY="210.0" prefHeight="27.0" prefWidth="183.0" />
+                  <PasswordField id="passwordfield" fx:id="passwordfield" layoutX="207.0" layoutY="210.0" prefHeight="27.0" prefWidth="183.0" promptText="Type your password" />
                   <Button id="createUserButton" fx:id="createUserButton" layoutX="217.0" layoutY="293.0" mnemonicParsing="false" onAction="#create_user_action" prefHeight="45.0" prefWidth="151.0" styleClass="login-btns" text="Create User" />
                   <Button id="back_btn" fx:id="back_btn" layoutX="8.0" layoutY="10.0" mnemonicParsing="false" onAction="#back_action" prefHeight="45.0" prefWidth="61.0" styleClass="login-btns" text="Back" />
                </children>
