@@ -1,0 +1,46 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500&display=swap');
+
+#second-anch {
+    -fx-background-color: #d7cacadb;
+    background-color: #d7cacadb;
+}
+
+.login-btns {
+    -fx-background-color: #ebba9c8f;
+    background-color: #ebba9c8f;
+    -fx-border-width: 1px;
+    border-width: 1px;
+    -fx-border-radius: 10px;
+    border-radius: 10px;
+    -fx-background-radius: 5px;
+    -fx-padding: 10px;
+    padding: 10px;
+    -fx-font-family: "Poppins", sans-serif;
+    font-family: "Poppins", sans-serif;
+    -fx-font-size: 16px;
+    font-size: 16px;
+    -fx-font-weight: 500;
+    font-weight: 500;
+}
+
+.login-btns:hover {
+    -fx-background-color: #ebba9c;
+    background-color: #ebba9c;
+    -fx-transition: background 1.9s ease;
+    transition: background 1.9s ease;
+}
+
+#namefield, #passwordfield{
+    -fx-text-fill: #000000;
+    -fx-prompt-text-fill: #000000cb;
+    -fx-border-color: #5e5454;
+    border-color: #5e5454;
+    -fx-border-width: 1px;
+    border-width: 1px;
+    -fx-border-style: solid;
+    border-style: solid;
+    -fx-border-radius: 12px;
+    border-radius: 12px;
+    -fx-background-color: transparent;
+    background-color: transparent;
+}
