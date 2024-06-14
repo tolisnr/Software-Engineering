@@ -24,11 +24,10 @@ public class Interface4 extends JFrame{
 
 		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
-        // Populate the team list
         ArrayList<Team> userTeams = user.getTeams();
         ArrayList<String> teamTitles = new ArrayList<>();
         for (Team team : userTeams) {
-            teamTitles.add(team.getTitle()); // Assuming there is a getTitle() method in Team class
+            teamTitles.add(team.getTitle());
         }
         teams = new JList<>(teamTitles.toArray(new String[0]));
 

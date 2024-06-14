@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1:3306
--- Generation Time: Jun 05, 2024 at 06:51 PM
+-- Generation Time: Jun 14, 2024 at 06:07 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.0.30
 
@@ -40,12 +40,19 @@ CREATE TABLE `balance` (
 --
 
 CREATE TABLE `expense` (
-  `expenseID` varchar(100) NOT NULL,
+  `expenseID` int(100) NOT NULL,
   `title` varchar(100) NOT NULL,
   `amount` double NOT NULL,
   `date` date NOT NULL,
   `payer` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `expense`
+--
+
+INSERT INTO `expense` (`expenseID`, `title`, `amount`, `date`, `payer`) VALUES
+(1, 'f', 10, '2024-06-14', 2);
 
 -- --------------------------------------------------------
 
@@ -60,6 +67,22 @@ CREATE TABLE `team` (
   `admin` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `team`
+--
+
+INSERT INTO `team` (`teamID`, `title`, `category`, `admin`) VALUES
+('52pGci', 'bb', '', 2),
+('8F49Ln', 'eleni', '', 2),
+('D2WEY5', 'ts', '', 2),
+('gltCOI', 'mmmm', 'nnn', 5),
+('hY4F1F', 'test', '', 2),
+('kuK37y', 'mpa', '', 1),
+('kuwH7E', 'sgfayd', '', 6),
+('NB9AV9', 'kapa', '', 2),
+('NLRn8x', 'DEN EXOYME CONTENT', 'BARIEMAI', 7),
+('VleUrx', 'aa', '', 2);
+
 -- --------------------------------------------------------
 
 --
@@ -69,6 +92,39 @@ CREATE TABLE `team` (
 CREATE TABLE `teams_users` (
   `userID` int(11) NOT NULL,
   `teamID` varchar(6) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `teams_users`
+--
+
+INSERT INTO `teams_users` (`userID`, `teamID`) VALUES
+(2, 'hY4F1F'),
+(2, 'hY4F1F'),
+(2, '52pGci'),
+(2, '52pGci'),
+(2, 'VleUrx'),
+(2, 'VleUrx'),
+(2, 'VleUrx'),
+(1, 'VleUrx'),
+(1, 'kuK37y'),
+(5, 'gltCOI'),
+(6, 'kuwH7E'),
+(7, 'NLRn8x'),
+(2, '8F49Ln'),
+(2, 'D2WEY5'),
+(1, 'hY4F1F'),
+(2, 'NB9AV9');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `team_expenses`
+--
+
+CREATE TABLE `team_expenses` (
+  `teamID` varchar(6) NOT NULL,
+  `expenseID` int(100) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -89,7 +145,12 @@ CREATE TABLE `users` (
 
 INSERT INTO `users` (`userID`, `username`, `password`) VALUES
 (1, 'eleni', 'test'),
-(2, 'eleni', 'tsotsou');
+(2, 'eleni', 'tsotsou'),
+(3, 'maria', 'mentaki'),
+(4, 'maria', 'mentaki'),
+(5, 'm', 'k'),
+(6, 'evagelia', '12345'),
+(7, 'PAOK', '1926');
 
 -- --------------------------------------------------------
 
@@ -99,7 +160,7 @@ INSERT INTO `users` (`userID`, `username`, `password`) VALUES
 
 CREATE TABLE `user_expense` (
   `userID` int(11) NOT NULL,
-  `expanseID` varchar(100) NOT NULL
+  `expenseID` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -134,6 +195,13 @@ ALTER TABLE `teams_users`
   ADD KEY `member` (`userID`);
 
 --
+-- Indexes for table `team_expenses`
+--
+ALTER TABLE `team_expenses`
+  ADD KEY `team_ex` (`teamID`),
+  ADD KEY `expanse` (`expenseID`);
+
+--
 -- Indexes for table `users`
 --
 ALTER TABLE `users`
@@ -143,18 +211,24 @@ ALTER TABLE `users`
 -- Indexes for table `user_expense`
 --
 ALTER TABLE `user_expense`
-  ADD KEY `user` (`userID`),
-  ADD KEY `expanse` (`expanseID`);
+  ADD KEY `user_expense` (`userID`),
+  ADD KEY `expense` (`expenseID`);
 
 --
 -- AUTO_INCREMENT for dumped tables
 --
 
 --
+-- AUTO_INCREMENT for table `expense`
+--
+ALTER TABLE `expense`
+  MODIFY `expenseID` int(100) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `userID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `userID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- Constraints for dumped tables
@@ -186,11 +260,18 @@ ALTER TABLE `teams_users`
   ADD CONSTRAINT `members` FOREIGN KEY (`teamID`) REFERENCES `team` (`teamID`);
 
 --
+-- Constraints for table `team_expenses`
+--
+ALTER TABLE `team_expenses`
+  ADD CONSTRAINT `expanse` FOREIGN KEY (`expenseID`) REFERENCES `expense` (`expenseID`),
+  ADD CONSTRAINT `team_ex` FOREIGN KEY (`teamID`) REFERENCES `team` (`teamID`);
+
+--
 -- Constraints for table `user_expense`
 --
 ALTER TABLE `user_expense`
-  ADD CONSTRAINT `expanse` FOREIGN KEY (`expanseID`) REFERENCES `expense` (`expenseID`),
-  ADD CONSTRAINT `expanses` FOREIGN KEY (`expanseID`) REFERENCES `expense` (`expenseID`);
+  ADD CONSTRAINT `expense` FOREIGN KEY (`expenseID`) REFERENCES `expense` (`expenseID`),
+  ADD CONSTRAINT `user_expense` FOREIGN KEY (`userID`) REFERENCES `users` (`userID`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

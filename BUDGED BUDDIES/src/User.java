@@ -22,19 +22,20 @@ public class User {
 
     public void JoinTeam(Team team) {
         Teams.add(team);
+    
         try (Connection conn = XAMPPConnection.getConnection()) {
-            // Εισαγωγή στον πίνακα συσχέτισης teams_users
             String insertTeamUserQuery = "INSERT INTO teams_users (teamID, userID) VALUES (?, ?)";
             PreparedStatement teamUserStatement = conn.prepareStatement(insertTeamUserQuery);
             teamUserStatement.setString(1, team.getTeamID());
             teamUserStatement.setInt(2, this.userID);
             teamUserStatement.executeUpdate();
-
-            System.out.println("Team and user added to the database.");
+    
+            System.out.println("User joined team successfully.");
         } catch (SQLException e) {
-            System.out.println("Error while adding team to the database: " + e.getMessage());
+            System.out.println("Error while joining team: " + e.getMessage());
         }
     }
+    
 
     public void CreateTeam(String title, String category) {
         String teamID = generateRandomCode();
@@ -64,11 +65,8 @@ public class User {
         }
 
         JOptionPane.showMessageDialog(null, "Ο κωδικός της ομάδας είναι:\n" + group.getTeamID());
-        
-        group.addUser(this);
     }
 
-    
     public void InsertUserinDataBase(User user) {
         String url = "jdbc:mysql://localhost:3306/budgedbuddies"; // Το URL της βάσης δεδομένων σας
         String username = "root"; // Το όνομα χρήστη της βάσης δεδομένων
@@ -136,16 +134,6 @@ public class User {
         return codeBuilder.toString();
     }
 
-	public String getUsername() {
-		return username;
-	}
-
-	public String getPassword() {
-		return password;
-	}
-
-    
-
     public ArrayList<Team> getTeams() {
         ArrayList<Team> teams = new ArrayList<>();
 
@@ -182,4 +170,11 @@ public class User {
         return userID;
     }
 
+    public String getUsername() {
+		return username;
+	}
+
+	public String getPassword() {
+		return password;
+	}
 }

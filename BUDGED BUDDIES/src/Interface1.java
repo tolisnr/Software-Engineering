@@ -7,6 +7,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+
 public class Interface1 extends JFrame{
 
 	private JButton CreateUser = new JButton("Create a new Account");
@@ -15,6 +16,13 @@ public class Interface1 extends JFrame{
 	public Interface1() {
         // Create background panel
         BackgroundImageExample backgroundPanel = new BackgroundImageExample("background.jpg");
+
+        //Create application icon
+        ImageIcon icon = new ImageIcon("icon.jpeg");
+
+        // Resize the image
+        Image resizedImage = icon.getImage().getScaledInstance(24, 24, Image.SCALE_DEFAULT);
+        ImageIcon resizedIcon = new ImageIcon(resizedImage);
 
         // Create a panel to hold the buttons
         JPanel buttonPanel = new JPanel();
@@ -48,6 +56,7 @@ public class Interface1 extends JFrame{
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setLocationRelativeTo(null);
         this.setVisible(true);
+        this.setIconImage(resizedIcon.getImage());
 
         // Add action listeners
         CreateUser.addActionListener(new ActionListener() {
