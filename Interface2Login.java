@@ -114,7 +114,7 @@ public class Interface2Login extends JFrame {
                     new Interface4(authenticateUser(name, pass));
                     dispose();
                 } else {
-                    JOptionPane.showMessageDialog(null, "Κάτι πήγε στραβά! Δοκιμάστε ξανά! Έχετε λογαριασμο;");
+                    JOptionPane.showMessageDialog(null, "Κάτι πήγε στραβά! Δοκιμάστε ξανά! Έχετε λογαριασμό;");
                 }
             }
 
