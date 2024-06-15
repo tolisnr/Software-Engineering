@@ -35,8 +35,12 @@ public class Interface8Expenses extends JFrame {
             @Override
             public void mouseClicked(MouseEvent e) {
                 if (e.getClickCount() == 2) {
-                    new Interface10AExpense().setVisible(true);
-        			dispose();
+                    int selectedIndex = expensesList.getSelectedIndex();
+                    if (selectedIndex != -1) {
+                        expense selectedExpense = expensesTeam.get(selectedIndex);
+                        new Interface10AExpense(team, user, selectedExpense).setVisible(true);
+        			    dispose();
+                    }
                 }
             }
         });

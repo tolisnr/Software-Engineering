@@ -2,8 +2,8 @@
 -- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
--- Host: 127.0.0.1:3306
--- Generation Time: Jun 14, 2024 at 06:07 PM
+-- Host: 127.0.0.1
+-- Generation Time: Jun 15, 2024 at 01:32 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.0.30
 
@@ -53,6 +53,17 @@ CREATE TABLE `expense` (
 
 INSERT INTO `expense` (`expenseID`, `title`, `amount`, `date`, `payer`) VALUES
 (1, 'f', 10, '2024-06-14', 2);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `expense_users(paidfor)`
+--
+
+CREATE TABLE `expense_users(paidfor)` (
+  `userID` int(11) NOT NULL,
+  `expenseID` int(100) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -181,6 +192,13 @@ ALTER TABLE `expense`
   ADD KEY `paying` (`payer`);
 
 --
+-- Indexes for table `expense_users(paidfor)`
+--
+ALTER TABLE `expense_users(paidfor)`
+  ADD KEY `ex_us` (`expenseID`),
+  ADD KEY `us_ex` (`userID`);
+
+--
 -- Indexes for table `team`
 --
 ALTER TABLE `team`
@@ -245,6 +263,13 @@ ALTER TABLE `balance`
 --
 ALTER TABLE `expense`
   ADD CONSTRAINT `paying` FOREIGN KEY (`payer`) REFERENCES `users` (`userID`);
+
+--
+-- Constraints for table `expense_users(paidfor)`
+--
+ALTER TABLE `expense_users(paidfor)`
+  ADD CONSTRAINT `ex_us` FOREIGN KEY (`expenseID`) REFERENCES `expense` (`expenseID`),
+  ADD CONSTRAINT `us_ex` FOREIGN KEY (`userID`) REFERENCES `users` (`userID`);
 
 --
 -- Constraints for table `team`

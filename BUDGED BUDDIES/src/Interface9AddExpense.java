@@ -1,118 +1,114 @@
 import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 public class Interface9AddExpense extends JFrame {
 
-    private JPanel panel = new JPanel();
-    private JButton BACK = new JButton("BACK");
-    private JLabel titleText = new JLabel("Δώσε το τίτλο του Expense: ");
-    private JTextField titleField = new JTextField();
-    private JLabel amountText = new JLabel("Δώσε το ποσό που πλήρωσες: ");
-    private JTextField amountField = new JTextField();
-    private JLabel dateText = new JLabel("Επέλεξε την ημερομηνία: ");
+    private JTextField titleField;
+    private JTextField amountField;
     private JSpinner dateSpinner;
-    private JLabel payerText = new JLabel("Επέλεξε ποιος πλήρωσε: ");
-    private JList<String> posPayer;
-    private JButton Save = new JButton("SAVE");
-    private ArrayList<User> users;
+    private JList<String> payerList;
+    private List<JCheckBox> paidForCheckboxes;
 
     public Interface9AddExpense(Team team, User user) {
-        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        setTitle("Add Expense");
+        setSize(600, 600);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLayout(new BorderLayout());
 
-        users = team.getUsers();
-        ArrayList<String> Payer = new ArrayList<>();
-        for (User u : users) {
-            Payer.add(u.getUsername());
+        List<User> teamUsers = team.getUsers();
+        List<String> userNames = new ArrayList<>();
+        for (User u : teamUsers) {
+            userNames.add(u.getUsername());
         }
-        posPayer = new JList<>(Payer.toArray(new String[0]));
 
-        // Initialize the date spinner with a SpinnerDateModel
-        SpinnerDateModel spinnerModel = new SpinnerDateModel();
-        dateSpinner = new JSpinner(spinnerModel);
-        dateSpinner.setEditor(new JSpinner.DateEditor(dateSpinner, "dd/MM/yyyy"));
+        payerList = new JList<>(userNames.toArray(new String[0]));
+        payerList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
-        dateSpinner.addChangeListener(new ChangeListener() {
-            @Override
-            public void stateChanged(ChangeEvent e) {
-                //Date selectedDate = (Date) spinnerModel.getValue();
-            }
-        });
+        JPanel paidForPanel = new JPanel();
+        paidForPanel.setLayout(new BoxLayout(paidForPanel, BoxLayout.Y_AXIS));
+        paidForCheckboxes = new ArrayList<>();
+        for (String username : userNames) {
+            JCheckBox checkBox = new JCheckBox(username);
+            paidForCheckboxes.add(checkBox);
+            paidForPanel.add(checkBox);
+        }
 
-        panel.add(BACK);
-        panel.add(titleText);
-        titleField.setPreferredSize(new Dimension(200, 30));
-        panel.add(titleField);
-        panel.add(amountText);
-        amountField.setPreferredSize(new Dimension(200, 30));
-        panel.add(amountField);
-        panel.add(dateText);
-        panel.add(dateSpinner);
-        panel.add(payerText);
-        panel.add(new JScrollPane(posPayer));
-        panel.add(Save);
+        titleField = new JTextField();
+        amountField = new JTextField();
+        dateSpinner = new JSpinner(new SpinnerDateModel());
 
-        this.setContentPane(panel);
+        JPanel formPanel = new JPanel(new GridLayout(6, 2));
+        formPanel.add(new JLabel("Title:"));
+        formPanel.add(titleField);
+        formPanel.add(new JLabel("Amount:"));
+        formPanel.add(amountField);
+        formPanel.add(new JLabel("Date:"));
+        formPanel.add(dateSpinner);
+        formPanel.add(new JLabel("Payer:"));
+        formPanel.add(new JScrollPane(payerList));
+        formPanel.add(new JLabel("Paid For:"));
+        formPanel.add(new JScrollPane(paidForPanel));
 
-        BACK.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                new Interface8Expenses(team, user);
-                dispose();
-            }
-        });
-
-        Save.addActionListener(new ActionListener() {
+        JButton saveButton = new JButton("Save");
+        saveButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 try {
                     String title = titleField.getText();
                     double amount = Double.parseDouble(amountField.getText());
-                    Date date = (Date) spinnerModel.getValue();
-                    String payerUsername = posPayer.getSelectedValue();
-
-                    // Find the selected payer User object
-                    User payer = null;
-                    for (User u : users) {
-                        if (u.getUsername().equals(payerUsername)) {
-                            payer = u;
-                            break;
+                    Date date = (Date) dateSpinner.getValue();
+                    int payerIndex = payerList.getSelectedIndex();
+    
+                    if (payerIndex == -1) {
+                        JOptionPane.showMessageDialog(null, "Please select a payer.");
+                        return;
+                    }
+    
+                    User payer = teamUsers.get(payerIndex);
+    
+                    List<User> paidForUsers = new ArrayList<>();
+                    for (int i = 0; i < paidForCheckboxes.size(); i++) {
+                        if (paidForCheckboxes.get(i).isSelected()) {
+                            paidForUsers.add(teamUsers.get(i));
                         }
                     }
-
-                    // Confirm selection with user
-                    if (payer != null) {
-                        int confirm = JOptionPane.showConfirmDialog(panel,
-                                "Do you want " + payer.getUsername() + " to be the payer?", "Confirm Payer Selection",
-                                JOptionPane.YES_NO_OPTION);
-                        if (confirm == JOptionPane.YES_OPTION) {
-							int id = 0;
-							expense aExpense = new expense(title, amount, date, payer, id);
-                            team.addExpense(aExpense);
-                            System.out.println("Expense added.");
-                            new Interface8Expenses(team, user);
-                            dispose();
-                        } else {
-                            System.out.println("Payer selection canceled.");
-                        }
-                    } else {
-                        System.out.println("Payer not found.");
+    
+                    List<Integer> paidForUsersID = new ArrayList<>();
+                    for (User u : paidForUsers) {
+                        paidForUsersID.add(u.getUserID());
                     }
+    
+                    if (paidForUsers.isEmpty()) {
+                        JOptionPane.showMessageDialog(null, "Please select at least one user for whom the expense is paid.");
+                        return;
+                    }
+    
+                    // Create new expense object
+                    int expenseID = 0; // Assuming expenseID is auto-generated
+                    expense newExpense = new expense(expenseID, title, amount, date, payer, paidForUsers);
+    
+                    // Add expense to team
+                    team.addExpense(newExpense, paidForUsersID);
+    
+                    // Display success message
+                    JOptionPane.showMessageDialog(null, "Expense added successfully.");
+    
+                    // Navigate back to the expenses interface
+                    new Interface8Expenses(team, user);
+                    dispose();
                 } catch (NumberFormatException ex) {
-                    ex.printStackTrace();
+                    JOptionPane.showMessageDialog(null, "Invalid amount format. Please enter a valid number.");
                 }
             }
         });
 
-        this.setVisible(true);
-        this.setSize(400, 400);
-        this.setTitle("Add Expense");
-        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        add(formPanel, BorderLayout.CENTER);
+        add(saveButton, BorderLayout.SOUTH);
+        setVisible(true);
     }
-
 }
