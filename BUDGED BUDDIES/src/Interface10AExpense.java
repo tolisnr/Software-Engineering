@@ -5,6 +5,7 @@ import java.text.SimpleDateFormat;
 import java.util.List;
 
 public class Interface10AExpense extends JFrame {
+
         private JLabel title = new JLabel();
         private JLabel amount = new JLabel();
         private JLabel date = new JLabel();
@@ -17,6 +18,7 @@ public class Interface10AExpense extends JFrame {
         private JButton DELETE = new JButton("Delete");
     
         public Interface10AExpense(Team team, User user, expense expense) {
+
             title.setText("Title: " + expense.getTitle());
             amount.setText("Amount: " + String.valueOf(expense.getAmount()));
             SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
@@ -57,7 +59,7 @@ public class Interface10AExpense extends JFrame {
             EDIT.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    new Interface9AddExpense(team, user); // Ensure expense is passed to edit
+                    new Interface12EditExpense(team, user, expense);
                     dispose();
                 }
             });
@@ -65,11 +67,16 @@ public class Interface10AExpense extends JFrame {
             DELETE.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    // Add logic to handle deleting the expense
-                    // Example: team.deleteExpense(expense);
-                    new Interface8Expenses(team, user);
+                    boolean deleted = expense.deleteExpense(expense.getExpenseID());
+                    if (deleted) {
+                        JOptionPane.showMessageDialog(null, "Expense deleted successfully");
+                    } else {
+                        JOptionPane.showMessageDialog(null, "Failed to delete expense");
+                    }
+                    new Interface8Expenses(team, user);  // Refresh expense list or navigate back
                     dispose();
                 }
+        
             });
     
             this.setVisible(true);

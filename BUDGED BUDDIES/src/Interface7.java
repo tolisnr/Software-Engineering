@@ -24,15 +24,42 @@ public class Interface7 extends JFrame {
         Image resizedImage = icon.getImage().getScaledInstance(24, 24, Image.SCALE_DEFAULT);
         ImageIcon resizedIcon = new ImageIcon(resizedImage);
 
-        // Create a panel for the back button and add it to the north
+        /* // Create a panel for the back button and add it to the north
         JPanel backButtonPanel = new JPanel();
         backButtonPanel.setOpaque(false); // Make back button panel transparent
         backButtonPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
         customizeButton(BACK);
         Dimension buttonSize = new Dimension(70, 30);
         BACK.setPreferredSize(buttonSize);
-        backButtonPanel.add(BACK);
+        backButtonPanel.add(BACK); */
 
+        //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        // Create a panel for the back button and add it to the north
+        JPanel backButtonPanel = new JPanel();
+        backButtonPanel.setOpaque(false); // Make back button panel transparent
+        backButtonPanel.setLayout(new BorderLayout());
+        customizeButton(BACK);
+        Dimension buttonSize = new Dimension(70, 30);
+        BACK.setPreferredSize(buttonSize);
+
+        JPanel backButtonWrapper = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        backButtonWrapper.setOpaque(false); // Make wrapper panel transparent
+        backButtonWrapper.add(BACK);
+        backButtonPanel.add(backButtonWrapper, BorderLayout.WEST);
+
+        // Create and customize the JLabel and JTextField for the team ID
+        JLabel teamIDLabel = new JLabel("TEAM ID:");
+        JTextField teamIDField = new JTextField(team.getTeamID());
+        teamIDField.setEditable(false); // Make the text field non-editable
+        customizeLabel(teamIDLabel);
+        customizeTextField(teamIDField);
+
+        JPanel teamIDPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        teamIDPanel.setOpaque(false); // Make the team ID panel transparent
+        teamIDPanel.add(teamIDLabel);
+        teamIDPanel.add(teamIDField);
+        backButtonPanel.add(teamIDPanel, BorderLayout.EAST);
+        //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         // Create a panel to hold the center buttons
         JPanel centerButtonPanel = new JPanel(new GridBagLayout());
         centerButtonPanel.setOpaque(false); // Make center button panel transparent
@@ -103,7 +130,18 @@ public class Interface7 extends JFrame {
         DeleteTeam.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-
+                int option = JOptionPane.showConfirmDialog(null, "Are you sure you want to delete this team?", "Confirmation", JOptionPane.YES_NO_OPTION);
+                if (option == JOptionPane.YES_OPTION) {
+                    // Assuming Team class has a deleteTeam method
+                    boolean deleted = team.deleteTeam();
+                    if (deleted) {
+                        JOptionPane.showMessageDialog(null, "Team deleted successfully.");
+                        new Interface4(user);
+                        dispose();
+                    } else {
+                        JOptionPane.showMessageDialog(null, "Failed to delete team. Please try again.");
+                    }
+                }
             }
         });
     }
@@ -117,6 +155,18 @@ public class Interface7 extends JFrame {
         Border border = new LineBorder(Color.BLACK, 2); // Black border with thickness 2
         button.setBorder(border);
         button.setFocusable(false);
+    }
+
+    private void customizeLabel(JLabel label) {
+        label.setFont(new Font("Arial", Font.BOLD, 16)); // Set font and size
+        label.setForeground(Color.BLACK); // Set text color
+    }
+
+    private void customizeTextField(JTextField textField) {
+        textField.setPreferredSize(new Dimension(100, 40)); // Set preferred size
+        textField.setFont(new Font("Arial", Font.BOLD, 16)); // Set font and size
+        textField.setForeground(Color.BLACK); // Set text color
+        textField.setBorder(new LineBorder(Color.BLACK, 2)); // Set border
     }
 
 

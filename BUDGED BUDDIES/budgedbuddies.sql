@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jun 15, 2024 at 01:32 PM
+-- Generation Time: Jun 15, 2024 at 03:50 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.0.30
 
@@ -52,7 +52,20 @@ CREATE TABLE `expense` (
 --
 
 INSERT INTO `expense` (`expenseID`, `title`, `amount`, `date`, `payer`) VALUES
-(1, 'f', 10, '2024-06-14', 2);
+(1, 'f', 10, '2024-06-14', 2),
+(2, 'HOTEL', 500, '2024-06-15', 2),
+(3, 'HOTEL', 500, '2024-06-15', 2),
+(4, 'sf', 2424, '2024-06-15', 2),
+(5, 'csc', 400, '2024-06-15', 2),
+(6, 'bj', 6966, '2024-06-15', 2),
+(7, 'bbi', 86, '2024-06-15', 2),
+(8, 'fsdef', 332, '2024-06-15', 2),
+(9, 'zxdc', 4342, '2024-06-15', 2),
+(10, 'sf', 34, '2024-06-15', 2),
+(11, 'dc', 323, '2024-06-15', 2),
+(12, 'fca', 32, '2024-06-15', 2),
+(14, 'cfs', 323, '2024-06-15', 2),
+(15, 'travel', 700, '2024-06-15', 2);
 
 -- --------------------------------------------------------
 
@@ -64,6 +77,21 @@ CREATE TABLE `expense_users(paidfor)` (
   `userID` int(11) NOT NULL,
   `expenseID` int(100) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `expense_users(paidfor)`
+--
+
+INSERT INTO `expense_users(paidfor)` (`userID`, `expenseID`) VALUES
+(2, 9),
+(8, 9),
+(8, 10),
+(2, 11),
+(8, 11),
+(8, 12),
+(8, 14),
+(2, 15),
+(8, 15);
 
 -- --------------------------------------------------------
 
@@ -88,6 +116,7 @@ INSERT INTO `team` (`teamID`, `title`, `category`, `admin`) VALUES
 ('D2WEY5', 'ts', '', 2),
 ('gltCOI', 'mmmm', 'nnn', 5),
 ('hY4F1F', 'test', '', 2),
+('Kl1Q9W', 'check', '', 2),
 ('kuK37y', 'mpa', '', 1),
 ('kuwH7E', 'sgfayd', '', 6),
 ('NB9AV9', 'kapa', '', 2),
@@ -125,7 +154,9 @@ INSERT INTO `teams_users` (`userID`, `teamID`) VALUES
 (2, '8F49Ln'),
 (2, 'D2WEY5'),
 (1, 'hY4F1F'),
-(2, 'NB9AV9');
+(2, 'NB9AV9'),
+(2, 'Kl1Q9W'),
+(8, 'Kl1Q9W');
 
 -- --------------------------------------------------------
 
@@ -137,6 +168,20 @@ CREATE TABLE `team_expenses` (
   `teamID` varchar(6) NOT NULL,
   `expenseID` int(100) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `team_expenses`
+--
+
+INSERT INTO `team_expenses` (`teamID`, `expenseID`) VALUES
+('Kl1Q9W', 7),
+('Kl1Q9W', 8),
+('Kl1Q9W', 9),
+('Kl1Q9W', 10),
+('Kl1Q9W', 11),
+('Kl1Q9W', 12),
+('Kl1Q9W', 14),
+('Kl1Q9W', 15);
 
 -- --------------------------------------------------------
 
@@ -161,7 +206,8 @@ INSERT INTO `users` (`userID`, `username`, `password`) VALUES
 (4, 'maria', 'mentaki'),
 (5, 'm', 'k'),
 (6, 'evagelia', '12345'),
-(7, 'PAOK', '1926');
+(7, 'PAOK', '1926'),
+(8, 'el', 'ts');
 
 -- --------------------------------------------------------
 
@@ -173,6 +219,22 @@ CREATE TABLE `user_expense` (
   `userID` int(11) NOT NULL,
   `expenseID` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `user_expense`
+--
+
+INSERT INTO `user_expense` (`userID`, `expenseID`) VALUES
+(2, 7),
+(2, 7),
+(8, 7),
+(2, 8),
+(2, 8),
+(8, 8),
+(2, 9),
+(2, 10),
+(2, 11),
+(2, 12);
 
 --
 -- Indexes for dumped tables
@@ -195,8 +257,8 @@ ALTER TABLE `expense`
 -- Indexes for table `expense_users(paidfor)`
 --
 ALTER TABLE `expense_users(paidfor)`
-  ADD KEY `ex_us` (`expenseID`),
-  ADD KEY `us_ex` (`userID`);
+  ADD KEY `us_ex` (`userID`),
+  ADD KEY `ex_us` (`expenseID`);
 
 --
 -- Indexes for table `team`
@@ -240,13 +302,13 @@ ALTER TABLE `user_expense`
 -- AUTO_INCREMENT for table `expense`
 --
 ALTER TABLE `expense`
-  MODIFY `expenseID` int(100) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `expenseID` int(100) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `userID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `userID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- Constraints for dumped tables
@@ -268,7 +330,7 @@ ALTER TABLE `expense`
 -- Constraints for table `expense_users(paidfor)`
 --
 ALTER TABLE `expense_users(paidfor)`
-  ADD CONSTRAINT `ex_us` FOREIGN KEY (`expenseID`) REFERENCES `expense` (`expenseID`),
+  ADD CONSTRAINT `ex_us` FOREIGN KEY (`expenseID`) REFERENCES `expense` (`expenseID`) ON DELETE CASCADE,
   ADD CONSTRAINT `us_ex` FOREIGN KEY (`userID`) REFERENCES `users` (`userID`);
 
 --
@@ -288,7 +350,7 @@ ALTER TABLE `teams_users`
 -- Constraints for table `team_expenses`
 --
 ALTER TABLE `team_expenses`
-  ADD CONSTRAINT `expanse` FOREIGN KEY (`expenseID`) REFERENCES `expense` (`expenseID`),
+  ADD CONSTRAINT `expanse` FOREIGN KEY (`expenseID`) REFERENCES `expense` (`expenseID`) ON DELETE CASCADE,
   ADD CONSTRAINT `team_ex` FOREIGN KEY (`teamID`) REFERENCES `team` (`teamID`);
 
 --

@@ -31,6 +31,50 @@ public class Team {
         return null;
     }
 
+    public boolean deleteTeam() {
+        boolean success = false;
+
+        try (Connection conn = XAMPPConnection.getConnection()) {
+            // Delete from teams_users table
+            String deleteTeamsUsersQuery = "DELETE FROM teams_users WHERE teamID = ?";
+            PreparedStatement teamsUsersStatement = conn.prepareStatement(deleteTeamsUsersQuery);
+            teamsUsersStatement.setString(1, this.teamID);
+            teamsUsersStatement.executeUpdate();
+
+            // Delete expenses associated with the team
+            for (expense exp : expenses) {
+                exp.deleteExpense(exp.getExpenseID());
+            }
+
+            // Delete from team_expenses table
+            String deleteTeamExpensesQuery = "DELETE FROM team_expenses WHERE teamID = ?";
+            PreparedStatement teamExpensesStatement = conn.prepareStatement(deleteTeamExpensesQuery);
+            teamExpensesStatement.setString(1, this.teamID);
+            teamExpensesStatement.executeUpdate();
+
+            // Delete from balance table (assuming balance table is related to team)
+            String deleteBalanceQuery = "DELETE FROM balance WHERE teamID = ?";
+            PreparedStatement balanceStatement = conn.prepareStatement(deleteBalanceQuery);
+            balanceStatement.setString(1, this.teamID);
+            balanceStatement.executeUpdate();
+
+            // Delete from team table
+            String deleteTeamQuery = "DELETE FROM team WHERE teamID = ?";
+            PreparedStatement teamStatement = conn.prepareStatement(deleteTeamQuery);
+            teamStatement.setString(1, this.teamID);
+            int rowsDeleted = teamStatement.executeUpdate();
+
+            if (rowsDeleted > 0) {
+                success = true;
+            }
+
+        } catch (SQLException e) {
+            System.out.println("Error deleting team: " + e.getMessage());
+        }
+
+        return success;
+    }
+
 	public void addExpense(expense aExpense, List<Integer> paidForUserIDs) {
         expenses.add(aExpense);
         try (Connection conn = XAMPPConnection.getConnection()) {
@@ -87,6 +131,55 @@ public class Team {
         }
     }
     
+    public void updateExpense(expense updatedExpense, List<Integer> paidForUserIDs) {
+        // Update in-memory list of expenses
+        for (int i = 0; i < expenses.size(); i++) {
+            expense currentExpense = expenses.get(i);
+            if (currentExpense.getExpenseID() == updatedExpense.getExpenseID()) {
+                expenses.set(i, updatedExpense);
+                break;
+            }
+        }
+    
+        // Update in the database
+        try (Connection conn = XAMPPConnection.getConnection()) {
+            // Update the expense table
+            String updateExpenseQuery = "UPDATE expense SET title = ?, amount = ?, date = ?, payer = ? WHERE expenseID = ?";
+            PreparedStatement updateExpenseStatement = conn.prepareStatement(updateExpenseQuery);
+            updateExpenseStatement.setString(1, updatedExpense.getTitle());
+            updateExpenseStatement.setDouble(2, updatedExpense.getAmount());
+            updateExpenseStatement.setDate(3, new java.sql.Date(updatedExpense.getDate().getTime()));
+            updateExpenseStatement.setInt(4, updatedExpense.getPayer().getUserID());
+            updateExpenseStatement.setInt(5, updatedExpense.getExpenseID());
+            int rowsUpdated = updateExpenseStatement.executeUpdate();
+    
+            if (rowsUpdated > 0) {
+                System.out.println("Expense updated in the database with expenseID: " + updatedExpense.getExpenseID());
+    
+                // Delete existing entries in expense_users(paidfor) table
+                String deletePaidForQuery = "DELETE FROM expense_users(paidfor) WHERE expenseID = ?";
+                PreparedStatement deletePaidForStatement = conn.prepareStatement(deletePaidForQuery);
+                deletePaidForStatement.setInt(1, updatedExpense.getExpenseID());
+                deletePaidForStatement.executeUpdate();
+    
+                // Insert new entries in expense_users(paidfor) table
+                String insertPaidForQuery = "INSERT INTO expense_users(paidfor) (userID, expenseID) VALUES (?, ?)";
+                PreparedStatement insertPaidForStatement = conn.prepareStatement(insertPaidForQuery);
+    
+                for (Integer userID : paidForUserIDs) {
+                    insertPaidForStatement.setInt(1, userID);
+                    insertPaidForStatement.setInt(2, updatedExpense.getExpenseID());
+                    insertPaidForStatement.executeUpdate();
+                }
+    
+                System.out.println("Users associated with updated expenseID " + updatedExpense.getExpenseID());
+            } else {
+                System.out.println("Failed to update expense in the database.");
+            }
+        } catch (SQLException e) {
+            System.out.println("Error while updating expense in the database: " + e.getMessage());
+        }
+    }
     
     
     public ArrayList<User> getUsers() {

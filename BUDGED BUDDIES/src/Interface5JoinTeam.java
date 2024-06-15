@@ -1,34 +1,65 @@
-
-import java.awt.Dimension;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
+import java.awt.*;
+import java.awt.event.*;
+import java.sql.*;
+import javax.swing.*;
+import javax.swing.border.*;
 
 public class Interface5JoinTeam extends JFrame{
 
-	private JPanel panel = new JPanel();
-	private JLabel text = new JLabel("Δώσε τον κωδικό της ομάδας: ");
+	private JLabel text = new JLabel("Δώστε τον κωδικό της ομάδας: ");
 	private JTextField teamIDField = new JTextField();
 	private JButton OK = new JButton("OK");
 	private JButton BACK = new JButton("BACK");
 	
 	public Interface5JoinTeam(User user) {
-		
-		panel.add(text);
-		teamIDField.setPreferredSize(new Dimension(200, 30));
-		panel.add(teamIDField);
-		panel.add(OK);
-		panel.add(BACK);
-		this.setContentPane(panel);
+
+		// Create background panel
+		BackgroundImageExample backgroundPanel = new BackgroundImageExample("background.jpg");
+
+		// Create application icon
+		ImageIcon icon = new ImageIcon("icon.jpeg");
+
+		// Resize the image
+		Image resizedImage = icon.getImage().getScaledInstance(24, 24, Image.SCALE_DEFAULT);
+		ImageIcon resizedIcon = new ImageIcon(resizedImage);
+
+		// Create a panel to hold the buttons
+		JPanel buttonPanel = new JPanel();
+		buttonPanel.setOpaque(false); // Make button panel transparent
+		buttonPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 200, 0)); // Center buttons with space between
+
+		// Buttons Appearance
+		customizeButton(OK);
+		customizeButton(BACK);
+
+		// Add buttons to the button panel
+		buttonPanel.add(OK);
+		buttonPanel.add(BACK);
+
+		// Add text field and label to a new panel
+		JPanel textPanel = new JPanel();
+		textPanel.setOpaque(false); // Make text panel transparent
+		textPanel.add(text);
+		teamIDField.setPreferredSize(new Dimension(200, 30)); // Set preferred size
+		teamIDField.setMaximumSize(new Dimension(200, 30)); // Set maximum size
+		textPanel.add(teamIDField);
+
+		// Create a layered pane to layer the background and the button panel
+		JLayeredPane layeredPane = new JLayeredPane();
+
+		// Add the background panel to the layered pane
+		backgroundPanel.setBounds(0, 0, 800, 600);
+		layeredPane.add(backgroundPanel, JLayeredPane.DEFAULT_LAYER);
+
+		// Add the button panel to the layered pane
+		buttonPanel.setBounds(0, 300, 800, 600);
+		layeredPane.add(buttonPanel, JLayeredPane.PALETTE_LAYER);
+
+		// Add the text panel to the layered pane
+		textPanel.setBounds(0, 200, 800, 600);
+		layeredPane.add(textPanel, JLayeredPane.PALETTE_LAYER);
+
+		layeredPane.setPreferredSize(new Dimension(800, 600));
 		
 		OK.addActionListener(new ActionListener() {
 
@@ -55,9 +86,12 @@ public class Interface5JoinTeam extends JFrame{
 			
 		});
 		
-		this.setVisible(true);
-        this.setSize(300, 300);
+		this.setContentPane(layeredPane);
+		this.pack();
+		this.setLocationRelativeTo(null);
+		this.setIconImage(resizedIcon.getImage());
         this.setTitle("Join Team");
+		this.setVisible(true);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	}
 	
@@ -85,4 +119,16 @@ public class Interface5JoinTeam extends JFrame{
             System.out.println("Error while searching for team: " + e.getMessage());
             return null;
         }
-    }}
+    }
+
+	private void customizeButton(JButton button) {
+        Dimension buttonSize = new Dimension(200, 50);
+        button.setPreferredSize(buttonSize);
+        button.setBackground(Color.GRAY); // Set background color
+        button.setForeground(Color.BLACK); // Set text color
+        button.setFont(new Font("Arial", Font.BOLD, 16)); // Set font and size
+        Border border = new LineBorder(Color.BLACK, 2); // Black border with thickness 2
+        button.setBorder(border);
+        button.setFocusable(false);
+    }
+}

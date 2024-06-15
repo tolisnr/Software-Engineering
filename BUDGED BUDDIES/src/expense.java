@@ -26,7 +26,7 @@ public class expense {
     public int getExpenseID() {
         return expenseID;
     }
-
+    
     public String getTitle() {
         return title;
     }
@@ -39,13 +39,34 @@ public class expense {
         return date;
     }
 
+    public List<User> getPaidFor() {
+        return paidFor;
+    }
+
     public User getPayer() {
         return payer;
     }
 
-    public List<User> getPaidFor() {
-        return paidFor;
+    public boolean deleteExpense(int expenseID) {
+        boolean success = false;
+        String deleteExpenseQuery = "DELETE FROM expense WHERE expenseID = ?";
+        
+        try (Connection conn = XAMPPConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(deleteExpenseQuery)) {
+            
+            stmt.setInt(1, expenseID);
+            int rowsAffected = stmt.executeUpdate();
+            
+            if (rowsAffected > 0) {
+                success = true;
+            }
+        } catch (SQLException e) {
+            System.out.println("Error deleting expense: " + e.getMessage());
+        }
+        
+        return success;
     }
+    
 
     private ArrayList<User> getPaidFor(int expenseID) {
         ArrayList<User> paidForUsers = new ArrayList<>();
@@ -77,7 +98,21 @@ public class expense {
         return paidForUsers;
     }
 
+    public void setTitle(String title) {
+        this.title = title;
+    }
 
+    public void setAmount(double amount) {
+        this.amount = amount;
+    }
+
+    public void setDate(Date date) {
+        this.date = date;
+    }
+
+    public void setPayer(User payer) {
+        this.payer = payer;
+    }
 
     public void setPaidFor(List<User> paidFor) {
         this.paidFor = paidFor;
