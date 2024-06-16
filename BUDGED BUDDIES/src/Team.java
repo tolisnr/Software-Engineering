@@ -3,6 +3,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -74,9 +75,9 @@ public class Team {
 
         return success;
     }
-
-	public void addExpense(expense aExpense, List<Integer> paidForUserIDs) {
-        expenses.add(aExpense);
+    public void addExpense(expense aExpense, List<Integer> paidForUserIDs) {
+        expenses.add(aExpense); // Assuming this is updating an in-memory list
+    
         try (Connection conn = XAMPPConnection.getConnection()) {
             // Insert the expense into the expense table
             String insertExpenseQuery = "INSERT INTO expense (title, amount, date, payer) VALUES (?, ?, ?, ?)";
@@ -116,6 +117,59 @@ public class Team {
                         int rowsUpdated = teamExpenseStatement.executeUpdate();
                         if (rowsUpdated > 0) {
                             System.out.println("Expense associated with teamID " + this.teamID);
+    
+                            // Calculate the share of the expense for each user who owes the payer
+                            double shareAmount = aExpense.getAmount() / paidForUserIDs.size();
+    
+                            // Update the balance table for each user who owes the payer
+                            String updateBalanceQuery = "INSERT INTO balance (balanceID, teamID, win, loss, amount, expenseID) " +
+                                    "VALUES (UUID(), ?, ?, ?, ?, ?) " +
+                                    "ON DUPLICATE KEY UPDATE amount = amount + VALUES(amount)";
+                            PreparedStatement balanceStatement = conn.prepareStatement(updateBalanceQuery);
+    
+                            // Update the owes table
+                            String checkOwesQuery = "SELECT Amount FROM owes WHERE teamID = ? AND winID = ? AND lossID = ?";
+                            String updateOwesQuery = "UPDATE owes SET Amount = Amount + ? WHERE teamID = ? AND winID = ? AND lossID = ?";
+                            String insertOwesQuery = "INSERT INTO owes (teamID, winID, lossID, Amount) VALUES (?, ?, ?, ?)";
+                            PreparedStatement checkOwesStatement = conn.prepareStatement(checkOwesQuery);
+                            PreparedStatement updateOwesStatement = conn.prepareStatement(updateOwesQuery);
+                            PreparedStatement insertOwesStatement = conn.prepareStatement(insertOwesQuery);
+    
+                            for (Integer lossUserID : paidForUserIDs) {
+                                if (!lossUserID.equals(aExpense.getPayer().getUserID())) {
+                                    // Update balance
+                                    balanceStatement.setString(1, this.teamID);
+                                    balanceStatement.setInt(2, aExpense.getPayer().getUserID());
+                                    balanceStatement.setInt(3, lossUserID);
+                                    balanceStatement.setDouble(4, shareAmount);
+                                    balanceStatement.setInt(5, aExpense.getExpenseID());
+                                    balanceStatement.executeUpdate();
+    
+                                    // Check if owes entry exists
+                                    checkOwesStatement.setString(1, this.teamID);
+                                    checkOwesStatement.setInt(2, aExpense.getPayer().getUserID());
+                                    checkOwesStatement.setInt(3, lossUserID);
+                                    ResultSet owesResultSet = checkOwesStatement.executeQuery();
+    
+                                    if (owesResultSet.next()) {
+                                        // Update existing owes entry
+                                        updateOwesStatement.setDouble(1, shareAmount);
+                                        updateOwesStatement.setString(2, this.teamID);
+                                        updateOwesStatement.setInt(3, aExpense.getPayer().getUserID());
+                                        updateOwesStatement.setInt(4, lossUserID);
+                                        updateOwesStatement.executeUpdate();
+                                    } else {
+                                        // Insert new owes entry
+                                        insertOwesStatement.setString(1, this.teamID);
+                                        insertOwesStatement.setInt(2, aExpense.getPayer().getUserID());
+                                        insertOwesStatement.setInt(3, lossUserID);
+                                        insertOwesStatement.setDouble(4, shareAmount);
+                                        insertOwesStatement.executeUpdate();
+                                    }
+                                }
+                            }
+    
+                            System.out.println("Balance and owes updated for expenseID " + aExpense.getExpenseID());
                         } else {
                             System.out.println("Failed to associate expense with team.");
                         }
@@ -130,56 +184,121 @@ public class Team {
             System.out.println("Error while adding expense to the database: " + e.getMessage());
         }
     }
-    
     public void updateExpense(expense updatedExpense, List<Integer> paidForUserIDs) {
-        // Update in-memory list of expenses
-        for (int i = 0; i < expenses.size(); i++) {
-            expense currentExpense = expenses.get(i);
-            if (currentExpense.getExpenseID() == updatedExpense.getExpenseID()) {
-                expenses.set(i, updatedExpense);
-                break;
-            }
-        }
-    
-        // Update in the database
         try (Connection conn = XAMPPConnection.getConnection()) {
-            // Update the expense table
-            String updateExpenseQuery = "UPDATE expense SET title = ?, amount = ?, date = ?, payer = ? WHERE expenseID = ?";
-            PreparedStatement updateExpenseStatement = conn.prepareStatement(updateExpenseQuery);
-            updateExpenseStatement.setString(1, updatedExpense.getTitle());
-            updateExpenseStatement.setDouble(2, updatedExpense.getAmount());
-            updateExpenseStatement.setDate(3, new java.sql.Date(updatedExpense.getDate().getTime()));
-            updateExpenseStatement.setInt(4, updatedExpense.getPayer().getUserID());
-            updateExpenseStatement.setInt(5, updatedExpense.getExpenseID());
-            int rowsUpdated = updateExpenseStatement.executeUpdate();
+            conn.setAutoCommit(false); // Start transaction
     
-            if (rowsUpdated > 0) {
-                System.out.println("Expense updated in the database with expenseID: " + updatedExpense.getExpenseID());
+            try {
+                // Get old expense data before updating
+                String selectOldExpenseQuery = "SELECT amount, payer FROM expense WHERE expenseID = ?";
+                PreparedStatement selectOldExpenseStatement = conn.prepareStatement(selectOldExpenseQuery);
+                selectOldExpenseStatement.setInt(1, updatedExpense.getExpenseID());
+                ResultSet oldExpenseResultSet = selectOldExpenseStatement.executeQuery();
+    
+                double oldAmount = 0;
+                int oldPayerID = 0;
+                if (oldExpenseResultSet.next()) {
+                    oldAmount = oldExpenseResultSet.getDouble("amount");
+                    oldPayerID = oldExpenseResultSet.getInt("payer");
+                }
+    
+                // Get old paidFor users
+                String selectOldPaidForQuery = "SELECT userID FROM `expense_users(paidfor)` WHERE expenseID = ?";
+                PreparedStatement selectOldPaidForStatement = conn.prepareStatement(selectOldPaidForQuery);
+                selectOldPaidForStatement.setInt(1, updatedExpense.getExpenseID());
+                ResultSet oldPaidForResultSet = selectOldPaidForStatement.executeQuery();
+    
+                List<Integer> oldPaidForUserIDs = new ArrayList<>();
+                while (oldPaidForResultSet.next()) {
+                    oldPaidForUserIDs.add(oldPaidForResultSet.getInt("userID"));
+                }
+    
+                // Calculate new share amount
+                double newShareAmount = updatedExpense.getAmount() / paidForUserIDs.size();
+                double oldShareAmount = oldAmount / oldPaidForUserIDs.size();
+    
+                // Adjust old payer's owes if the payer has changed
+                if (oldPayerID != updatedExpense.getPayer().getUserID()) {
+                    // Subtract old share amount from old payer's owes
+                    for (Integer oldUserID : oldPaidForUserIDs) {
+                        if (!oldUserID.equals(oldPayerID) && !paidForUserIDs.contains(oldUserID)) {
+                            String adjustOldPayerOwesQuery = "UPDATE owes SET Amount = Amount - ? WHERE teamID = ? AND winID = ? AND lossID = ?";
+                            PreparedStatement adjustOldPayerOwesStatement = conn.prepareStatement(adjustOldPayerOwesQuery);
+                            adjustOldPayerOwesStatement.setDouble(1, oldShareAmount);
+                            adjustOldPayerOwesStatement.setString(2, this.teamID);
+                            adjustOldPayerOwesStatement.setInt(3, oldPayerID);
+                            adjustOldPayerOwesStatement.setInt(4, oldUserID);
+                            adjustOldPayerOwesStatement.executeUpdate();
+                        }
+                    }
+                }
     
                 // Delete existing entries in expense_users(paidfor) table
-                String deletePaidForQuery = "DELETE FROM expense_users(paidfor) WHERE expenseID = ?";
+                String deletePaidForQuery = "DELETE FROM `expense_users(paidfor)` WHERE expenseID = ?";
                 PreparedStatement deletePaidForStatement = conn.prepareStatement(deletePaidForQuery);
                 deletePaidForStatement.setInt(1, updatedExpense.getExpenseID());
                 deletePaidForStatement.executeUpdate();
     
                 // Insert new entries in expense_users(paidfor) table
-                String insertPaidForQuery = "INSERT INTO expense_users(paidfor) (userID, expenseID) VALUES (?, ?)";
+                String insertPaidForQuery = "INSERT INTO `expense_users(paidfor)` (userID, expenseID) VALUES (?, ?)";
                 PreparedStatement insertPaidForStatement = conn.prepareStatement(insertPaidForQuery);
-    
                 for (Integer userID : paidForUserIDs) {
                     insertPaidForStatement.setInt(1, userID);
                     insertPaidForStatement.setInt(2, updatedExpense.getExpenseID());
                     insertPaidForStatement.executeUpdate();
                 }
     
-                System.out.println("Users associated with updated expenseID " + updatedExpense.getExpenseID());
-            } else {
-                System.out.println("Failed to update expense in the database.");
+                // Update expense table
+                String updateExpenseQuery = "UPDATE expense SET title = ?, amount = ?, date = ?, payer = ? WHERE expenseID = ?";
+                PreparedStatement updateExpenseStatement = conn.prepareStatement(updateExpenseQuery);
+                updateExpenseStatement.setString(1, updatedExpense.getTitle());
+                updateExpenseStatement.setDouble(2, updatedExpense.getAmount());
+                updateExpenseStatement.setDate(3, new java.sql.Date(updatedExpense.getDate().getTime()));
+                updateExpenseStatement.setInt(4, updatedExpense.getPayer().getUserID());
+                updateExpenseStatement.setInt(5, updatedExpense.getExpenseID());
+                updateExpenseStatement.executeUpdate();
+    
+                // Update or insert owes table for new expense
+                String updateOwesQuery = "INSERT INTO owes (teamID, winID, lossID, Amount) VALUES (?, ?, ?, ?) " +
+                                         "ON DUPLICATE KEY UPDATE Amount = VALUES(Amount)";
+                PreparedStatement updateOwesStatement = conn.prepareStatement(updateOwesQuery);
+                for (Integer lossUserID : paidForUserIDs) {
+                    if (!lossUserID.equals(updatedExpense.getPayer().getUserID())) {
+                        updateOwesStatement.setString(1, this.teamID);
+                        updateOwesStatement.setInt(2, updatedExpense.getPayer().getUserID());
+                        updateOwesStatement.setInt(3, lossUserID);
+                        updateOwesStatement.setDouble(4, newShareAmount);
+                        updateOwesStatement.executeUpdate();
+                    }
+                }
+    
+                // Subtract old share amount for users no longer paid for this expense
+                for (Integer oldUserID : oldPaidForUserIDs) {
+                    if (!paidForUserIDs.contains(oldUserID)) {
+                        String subtractOldShareQuery = "UPDATE owes SET Amount = Amount - ? WHERE teamID = ? AND winID = ? AND lossID = ?";
+                        PreparedStatement subtractOldShareStatement = conn.prepareStatement(subtractOldShareQuery);
+                        subtractOldShareStatement.setDouble(1, oldShareAmount);
+                        subtractOldShareStatement.setString(2, this.teamID);
+                        subtractOldShareStatement.setInt(3, oldPayerID);
+                        subtractOldShareStatement.setInt(4, oldUserID);
+                        subtractOldShareStatement.executeUpdate();
+                    }
+                }
+    
+                // Commit transaction
+                conn.commit();
+                System.out.println("Expense and related balances updated successfully.");
+    
+            } catch (SQLException e) {
+                conn.rollback(); // Rollback transaction on error
+                System.out.println("Error while updating expense and balances: " + e.getMessage());
             }
         } catch (SQLException e) {
-            System.out.println("Error while updating expense in the database: " + e.getMessage());
+            System.out.println("Database connection error: " + e.getMessage());
         }
     }
+    
+    
     
     
     public ArrayList<User> getUsers() {
@@ -212,53 +331,55 @@ public class Team {
         return users;
     }
 
-	public ArrayList<expense> getExpenses() {
-        ArrayList<expense> teamExpenses = new ArrayList<>();
+public ArrayList<expense> getExpenses() {
+    ArrayList<expense> teamExpenses = new ArrayList<>();
 
-        String query = "SELECT e.expenseID, e.title, e.amount, e.date, e.payer " +
-                       "FROM expense e " +
-                       "INNER JOIN team_expenses te ON e.expenseID = te.expenseID " +
-                       "WHERE te.teamID = ?";
+    String query = "SELECT e.expenseID, e.title, e.amount, e.date, e.payer " +
+                   "FROM expense e " +
+                   "INNER JOIN team_expenses te ON e.expenseID = te.expenseID " +
+                   "WHERE te.teamID = ?";
 
-        try (Connection conn = XAMPPConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(query)) {
+    try (Connection conn = XAMPPConnection.getConnection();
+         PreparedStatement stmt = conn.prepareStatement(query)) {
 
-            stmt.setString(1, this.teamID);
+        stmt.setString(1, this.teamID);
 
-            ResultSet rs = stmt.executeQuery();
-            while (rs.next()) {
-                int expenseID = rs.getInt("expenseID");
-                String title = rs.getString("title");
-                double amount = rs.getDouble("amount");
-                Date date = rs.getDate("date");
-                int payerID = rs.getInt("payer");
+        ResultSet rs = stmt.executeQuery();
+        while (rs.next()) {
+            int expenseID = rs.getInt("expenseID");
+            String title = rs.getString("title");
+            double amount = rs.getDouble("amount");
+            Date date = rs.getDate("date");
+            int payerID = rs.getInt("payer");
 
-                // Fetch payer details from users table
-                User payer = getUserByID(payerID);
+            // Fetch payer details from users table
+            User payer = getUserByID(payerID);
 
-                // Fetch the list of users for whom the expense is paid
-                List<User> paidForUsers = getPaidForUsers(expenseID);
+            // Fetch the list of users for whom the expense is paid
+            expense exp = new expense(expenseID);
+            List<User> paidForUsers = exp.getPaidFor(expenseID);
 
-                // Create Expense object
-                expense expense = new expense(expenseID, title, amount, date, payer, paidForUsers);
-                teamExpenses.add(expense);
-            }
-
-        } catch (SQLException e) {
-            System.out.println("Error fetching expenses for team: " + e.getMessage());
+            // Create Expense object
+            expense expense = new expense(expenseID, title, amount, date, payer, paidForUsers);
+            teamExpenses.add(expense);
         }
 
-        for (expense exp : teamExpenses) {
-            System.out.println("Expense Title: " + exp.getTitle());
-            System.out.println("Amount: " + exp.getAmount());
-            System.out.println("Date: " + exp.getDate());
-            System.out.println("Payer: " + exp.getPayer().getUsername()); // Example assuming User has getUsername() method
-            System.out.println("Paid For: " + exp.getPaidFor().stream().map(User::getUsername).toArray(String[]::new)); // Assuming User has getUsername() method
-            System.out.println("---");
-        }
-
-        return teamExpenses;
+    } catch (SQLException e) {
+        System.out.println("Error fetching expenses for team: " + e.getMessage());
     }
+
+    for (expense exp : teamExpenses) {
+        System.out.println("Expense Title: " + exp.getTitle());
+        System.out.println("Amount: " + exp.getAmount());
+        System.out.println("Date: " + exp.getDate());
+        System.out.println("Payer: " + exp.getPayer().getUsername()); // Example assuming User has getUsername() method
+        System.out.println("Paid For: " + Arrays.toString(exp.getPaidFor().stream().map(User::getUsername).toArray(String[]::new))); // Assuming User has getUsername() method
+        System.out.println("---");
+    }
+
+    return teamExpenses;
+}
+
 
 	public static User getUserByID(int userID) {
         User user = null;
@@ -283,33 +404,6 @@ public class Team {
 
         return user;
     }
-
-    private List<User> getPaidForUsers(int expenseID) {
-        List<User> paidForUsers = new ArrayList<>();
-        String query = "SELECT ue.userID, u.username, u.password " +
-                       "FROM user_expense ue " +
-                       "INNER JOIN users u ON ue.userID = u.userID " +
-                       "WHERE ue.expenseID = ?";
-
-        try (Connection conn = XAMPPConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(query)) {
-
-            stmt.setInt(1, expenseID);
-            ResultSet rs = stmt.executeQuery();
-
-            while (rs.next()) {
-                int userID = rs.getInt("userID");
-                String username = rs.getString("username");
-                String password = rs.getString("password");
-                paidForUsers.add(new User(username, password, userID));
-            }
-        } catch (SQLException e) {
-            System.out.println("Error fetching paid for users: " + e.getMessage());
-        }
-
-        return paidForUsers;
-    }
-
 
     public String getTeamID() {
         return teamID;

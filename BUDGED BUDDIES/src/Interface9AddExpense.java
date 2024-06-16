@@ -7,7 +7,6 @@ import java.util.List;
 import javax.swing.*;
 public class Interface9AddExpense extends JFrame {
 
-    private expense existingExpense;
     private JTextField titleField;
     private JTextField amountField;
     private JSpinner dateSpinner;
@@ -55,27 +54,7 @@ public class Interface9AddExpense extends JFrame {
         formPanel.add(new JScrollPane(payerList));
         formPanel.add(new JLabel("Paid For:"));
         formPanel.add(new JScrollPane(paidForPanel));
-
-        // Prepopulate fields with existing expense data
-        titleField.setText(existingExpense.getTitle());
-        amountField.setText(String.valueOf(existingExpense.getAmount()));
-        dateSpinner.setValue(existingExpense.getDate());
-
-        // Preselect payer in the list if valid
-        User payer = existingExpense.getPayer();
-        int payerIndex = teamUsers.indexOf(payer);
-        if (payerIndex != -1) {
-            payerList.setSelectedIndex(payerIndex);
-        }
-
-        // Preselect paidFor checkboxes based on existing expense
-        List<User> paidForUsers = existingExpense.getPaidFor();
-        for (User paidForUser : paidForUsers) {
-            int index = teamUsers.indexOf(paidForUser);
-            if (index != -1 && index < paidForCheckboxes.size()) {
-                paidForCheckboxes.get(index).setSelected(true);
-            }
-        }
+        
 
         JButton saveButton = new JButton("Save");
         saveButton.addActionListener(new ActionListener() {

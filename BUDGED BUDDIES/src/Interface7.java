@@ -1,6 +1,11 @@
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
 import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.border.LineBorder;
@@ -115,7 +120,14 @@ public class Interface7 extends JFrame {
         Balances.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                new Interface11Balances();
+                boolean hasNonZeroOwes = checkNonZeroOwes(team);
+
+                if (team.getUsers().size() == 1 || !hasNonZeroOwes) {
+                    JOptionPane.showMessageDialog(null, "There are no Balances.");
+                } else {
+                    new Interface11Balances(team, user);
+                    dispose(); // Close Interface7 when opening Interface11Balances
+                }
             }
         });
 
@@ -169,5 +181,23 @@ public class Interface7 extends JFrame {
         textField.setBorder(new LineBorder(Color.BLACK, 2)); // Set border
     }
 
+    private boolean checkNonZeroOwes(Team team) {
+    boolean hasNonZeroOwes = false;
 
+    try (Connection conn = XAMPPConnection.getConnection()) {
+        String selectOwesQuery = "SELECT COUNT(*) AS nonZeroCount FROM owes WHERE teamID = ? AND Amount <> 0";
+        PreparedStatement selectOwesStatement = conn.prepareStatement(selectOwesQuery);
+        selectOwesStatement.setString(1, team.getTeamID()); // Assuming getTeamID() retrieves the team's ID
+
+        ResultSet owesResultSet = selectOwesStatement.executeQuery();
+        if (owesResultSet.next()) {
+            int nonZeroCount = owesResultSet.getInt("nonZeroCount");
+            hasNonZeroOwes = nonZeroCount > 0;
+        }
+    } catch (SQLException ex) {
+        System.out.println("Error checking non-zero owes: " + ex.getMessage());
+    }
+
+        return hasNonZeroOwes;
+    }
 }

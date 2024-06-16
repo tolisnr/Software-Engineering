@@ -29,12 +29,42 @@ public class User {
             teamUserStatement.setString(1, team.getTeamID());
             teamUserStatement.setInt(2, this.userID);
             teamUserStatement.executeUpdate();
-    
+            
+            // Fetch all users in the team
+            String fetchTeamUsersQuery = "SELECT userID FROM teams_users WHERE teamID = ?";
+            PreparedStatement fetchTeamUsersStatement = conn.prepareStatement(fetchTeamUsersQuery);
+            fetchTeamUsersStatement.setString(1, team.getTeamID());
+            ResultSet rs = fetchTeamUsersStatement.executeQuery();
+            
+            // Insert entries into owes table
+            String insertOwesQuery = "INSERT INTO owes (teamID, lossID, winID, Amount) VALUES (?, ?, ?, ?)";
+            PreparedStatement insertOwesStatement = conn.prepareStatement(insertOwesQuery);
+            
+            while (rs.next()) {
+                int existingUserID = rs.getInt("userID");
+                
+                if (existingUserID != this.userID) {
+                    // Create an entry where the new user is the win and existing user is the loss
+                    insertOwesStatement.setString(1, team.getTeamID());
+                    insertOwesStatement.setInt(2, existingUserID);
+                    insertOwesStatement.setInt(3, this.userID);
+                    insertOwesStatement.setDouble(4, 0.0);
+                    insertOwesStatement.executeUpdate();
+                    
+                    // Create an entry where the existing user is the win and the new user is the loss
+                    insertOwesStatement.setString(1, team.getTeamID());
+                    insertOwesStatement.setInt(2, this.userID);
+                    insertOwesStatement.setInt(3, existingUserID);
+                    insertOwesStatement.setDouble(4, 0.0);
+                    insertOwesStatement.executeUpdate();
+                }
+            }
+            
             System.out.println("User joined team successfully.");
         } catch (SQLException e) {
             System.out.println("Error while joining team: " + e.getMessage());
         }
-    }
+    }    
     
 
     public void CreateTeam(String title, String category) {

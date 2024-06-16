@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jun 15, 2024 at 03:50 PM
+-- Generation Time: Jun 16, 2024 at 04:28 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.0.30
 
@@ -30,8 +30,19 @@ SET time_zone = "+00:00";
 CREATE TABLE `balance` (
   `balanceID` varchar(100) NOT NULL,
   `teamID` varchar(6) NOT NULL,
-  `amountOwed` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL CHECK (json_valid(`amountOwed`))
+  `expenseID` int(100) NOT NULL,
+  `win` int(11) NOT NULL,
+  `loss` int(11) NOT NULL,
+  `amount` double NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `balance`
+--
+
+INSERT INTO `balance` (`balanceID`, `teamID`, `expenseID`, `win`, `loss`, `amount`) VALUES
+('3037cfdb-2be7-11ef-a93a-ac198eff75f2', 'Tii5jd', 36, 2, 8, 100),
+('3039cfc4-2be7-11ef-a93a-ac198eff75f2', 'Tii5jd', 36, 2, 9, 100);
 
 -- --------------------------------------------------------
 
@@ -60,12 +71,29 @@ INSERT INTO `expense` (`expenseID`, `title`, `amount`, `date`, `payer`) VALUES
 (6, 'bj', 6966, '2024-06-15', 2),
 (7, 'bbi', 86, '2024-06-15', 2),
 (8, 'fsdef', 332, '2024-06-15', 2),
-(9, 'zxdc', 4342, '2024-06-15', 2),
-(10, 'sf', 34, '2024-06-15', 2),
+(10, 'sagapo', 34, '2024-06-15', 2),
 (11, 'dc', 323, '2024-06-15', 2),
 (12, 'fca', 32, '2024-06-15', 2),
 (14, 'cfs', 323, '2024-06-15', 2),
-(15, 'travel', 700, '2024-06-15', 2);
+(15, 'travel', 800, '2024-06-15', 2),
+(18, 'bb', 86, '2024-06-15', 2),
+(19, 'drinks', 80, '2024-06-16', 2),
+(21, 'Hotel', 90, '2024-06-16', 2),
+(22, 'hotel', 200, '2024-06-16', 2),
+(23, 'flight', 300, '2024-06-16', 8),
+(24, 'taxi', 20, '2024-06-16', 2),
+(25, 'food', 40, '2024-06-16', 8),
+(26, 'HOTEL', 2000, '2024-06-16', 2),
+(27, 'hotel', 2000, '2024-06-16', 9),
+(28, 'flight', 500, '2024-06-16', 9),
+(29, 'hotel', 1000, '2024-06-16', 2),
+(30, 'flight', 300, '2024-06-16', 9),
+(31, 'mpanio', 300, '2024-06-16', 2),
+(32, 'tsai', 900, '2024-06-16', 9),
+(33, 'tower', 30, '2024-06-16', 2),
+(34, 'hotel', 300, '2024-06-16', 2),
+(35, 'hotel', 300, '2024-06-16', 9),
+(36, 'eleni', 300, '2024-06-16', 9);
 
 -- --------------------------------------------------------
 
@@ -83,15 +111,106 @@ CREATE TABLE `expense_users(paidfor)` (
 --
 
 INSERT INTO `expense_users(paidfor)` (`userID`, `expenseID`) VALUES
-(2, 9),
-(8, 9),
 (8, 10),
 (2, 11),
 (8, 11),
 (8, 12),
 (8, 14),
 (2, 15),
-(8, 15);
+(8, 15),
+(8, 18),
+(2, 19),
+(8, 19),
+(8, 21),
+(2, 21),
+(2, 22),
+(8, 22),
+(2, 23),
+(8, 23),
+(2, 24),
+(8, 24),
+(2, 25),
+(8, 25),
+(8, 26),
+(2, 26),
+(8, 27),
+(9, 27),
+(8, 28),
+(9, 28),
+(2, 29),
+(8, 29),
+(9, 29),
+(2, 30),
+(8, 30),
+(9, 30),
+(2, 31),
+(8, 31),
+(9, 31),
+(2, 32),
+(8, 32),
+(2, 33),
+(9, 33),
+(2, 34),
+(8, 34),
+(2, 35),
+(9, 35),
+(8, 36),
+(9, 36);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `owes`
+--
+
+CREATE TABLE `owes` (
+  `teamID` varchar(6) NOT NULL,
+  `lossID` int(11) NOT NULL,
+  `winID` int(11) NOT NULL,
+  `Amount` double NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `owes`
+--
+
+INSERT INTO `owes` (`teamID`, `lossID`, `winID`, `Amount`) VALUES
+('3pMF1o', 8, 2, 433.3333333333333),
+('3pMF1o', 9, 2, 433.3333333333333),
+('3pMF1o', 2, 8, 0),
+('3pMF1o', 9, 8, 0),
+('3pMF1o', 2, 9, 450),
+('3pMF1o', 8, 9, 450),
+('EmSJ2a', 8, 2, 0),
+('EmSJ2a', 2, 8, -2000),
+('IdXjwu', 8, 2, 10),
+('IdXjwu', 9, 2, 15),
+('IdXjwu', 2, 8, 0),
+('IdXjwu', 9, 8, 0),
+('IdXjwu', 2, 9, 0),
+('IdXjwu', 8, 9, 0),
+('j2SzY7', 9, 8, 0),
+('j2SzY7', 8, 9, 0),
+('le2E7E', 8, 2, 0),
+('le2E7E', 9, 2, 150),
+('le2E7E', 2, 8, 0),
+('le2E7E', 9, 8, 0),
+('le2E7E', 2, 9, 150),
+('le2E7E', 8, 9, 0),
+('SYJx0C', 8, 2, 150),
+('SYJx0C', 9, 2, 100),
+('SYJx0C', 2, 8, 0),
+('SYJx0C', 9, 8, 0),
+('SYJx0C', 2, 9, 0),
+('SYJx0C', 8, 9, 0),
+('Tii5jd', 8, 2, 100),
+('Tii5jd', 9, 2, 100),
+('Tii5jd', 2, 8, 0),
+('Tii5jd', 9, 8, 0),
+('Tii5jd', 2, 9, 0),
+('Tii5jd', 8, 9, 150),
+('UVHuOg', 8, 2, -20),
+('UVHuOg', 2, 8, 0);
 
 -- --------------------------------------------------------
 
@@ -111,17 +230,16 @@ CREATE TABLE `team` (
 --
 
 INSERT INTO `team` (`teamID`, `title`, `category`, `admin`) VALUES
-('52pGci', 'bb', '', 2),
 ('8F49Ln', 'eleni', '', 2),
 ('D2WEY5', 'ts', '', 2),
 ('gltCOI', 'mmmm', 'nnn', 5),
+('guUwMY', 'dokimi', 'fagita', 2),
 ('hY4F1F', 'test', '', 2),
-('Kl1Q9W', 'check', '', 2),
 ('kuK37y', 'mpa', '', 1),
 ('kuwH7E', 'sgfayd', '', 6),
-('NB9AV9', 'kapa', '', 2),
 ('NLRn8x', 'DEN EXOYME CONTENT', 'BARIEMAI', 7),
-('VleUrx', 'aa', '', 2);
+('Q0XfSf', 'paris', '', 8),
+('Tii5jd', 'paris', '', 2);
 
 -- --------------------------------------------------------
 
@@ -139,24 +257,17 @@ CREATE TABLE `teams_users` (
 --
 
 INSERT INTO `teams_users` (`userID`, `teamID`) VALUES
-(2, 'hY4F1F'),
-(2, 'hY4F1F'),
-(2, '52pGci'),
-(2, '52pGci'),
-(2, 'VleUrx'),
-(2, 'VleUrx'),
-(2, 'VleUrx'),
-(1, 'VleUrx'),
 (1, 'kuK37y'),
 (5, 'gltCOI'),
 (6, 'kuwH7E'),
 (7, 'NLRn8x'),
 (2, '8F49Ln'),
 (2, 'D2WEY5'),
-(1, 'hY4F1F'),
-(2, 'NB9AV9'),
-(2, 'Kl1Q9W'),
-(8, 'Kl1Q9W');
+(2, 'guUwMY'),
+(8, 'Q0XfSf'),
+(2, 'Tii5jd'),
+(8, 'Tii5jd'),
+(9, 'Tii5jd');
 
 -- --------------------------------------------------------
 
@@ -174,14 +285,7 @@ CREATE TABLE `team_expenses` (
 --
 
 INSERT INTO `team_expenses` (`teamID`, `expenseID`) VALUES
-('Kl1Q9W', 7),
-('Kl1Q9W', 8),
-('Kl1Q9W', 9),
-('Kl1Q9W', 10),
-('Kl1Q9W', 11),
-('Kl1Q9W', 12),
-('Kl1Q9W', 14),
-('Kl1Q9W', 15);
+('Tii5jd', 36);
 
 -- --------------------------------------------------------
 
@@ -207,34 +311,8 @@ INSERT INTO `users` (`userID`, `username`, `password`) VALUES
 (5, 'm', 'k'),
 (6, 'evagelia', '12345'),
 (7, 'PAOK', '1926'),
-(8, 'el', 'ts');
-
--- --------------------------------------------------------
-
---
--- Table structure for table `user_expense`
---
-
-CREATE TABLE `user_expense` (
-  `userID` int(11) NOT NULL,
-  `expenseID` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `user_expense`
---
-
-INSERT INTO `user_expense` (`userID`, `expenseID`) VALUES
-(2, 7),
-(2, 7),
-(8, 7),
-(2, 8),
-(2, 8),
-(8, 8),
-(2, 9),
-(2, 10),
-(2, 11),
-(2, 12);
+(8, 'el', 'ts'),
+(9, 'ma', 'me');
 
 --
 -- Indexes for dumped tables
@@ -244,7 +322,11 @@ INSERT INTO `user_expense` (`userID`, `expenseID`) VALUES
 -- Indexes for table `balance`
 --
 ALTER TABLE `balance`
-  ADD KEY `team` (`teamID`);
+  ADD UNIQUE KEY `unique_balance` (`teamID`,`win`,`loss`),
+  ADD KEY `team` (`teamID`),
+  ADD KEY `balance_win_fk` (`win`),
+  ADD KEY `balance_loss_fk` (`loss`),
+  ADD KEY `exid` (`expenseID`);
 
 --
 -- Indexes for table `expense`
@@ -259,6 +341,12 @@ ALTER TABLE `expense`
 ALTER TABLE `expense_users(paidfor)`
   ADD KEY `us_ex` (`userID`),
   ADD KEY `ex_us` (`expenseID`);
+
+--
+-- Indexes for table `owes`
+--
+ALTER TABLE `owes`
+  ADD PRIMARY KEY (`teamID`,`winID`,`lossID`);
 
 --
 -- Indexes for table `team`
@@ -288,13 +376,6 @@ ALTER TABLE `users`
   ADD PRIMARY KEY (`userID`);
 
 --
--- Indexes for table `user_expense`
---
-ALTER TABLE `user_expense`
-  ADD KEY `user_expense` (`userID`),
-  ADD KEY `expense` (`expenseID`);
-
---
 -- AUTO_INCREMENT for dumped tables
 --
 
@@ -302,13 +383,13 @@ ALTER TABLE `user_expense`
 -- AUTO_INCREMENT for table `expense`
 --
 ALTER TABLE `expense`
-  MODIFY `expenseID` int(100) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
+  MODIFY `expenseID` int(100) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=37;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `userID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `userID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- Constraints for dumped tables
@@ -318,6 +399,10 @@ ALTER TABLE `users`
 -- Constraints for table `balance`
 --
 ALTER TABLE `balance`
+  ADD CONSTRAINT `balance_loss_fk` FOREIGN KEY (`loss`) REFERENCES `users` (`userID`),
+  ADD CONSTRAINT `balance_team_fk` FOREIGN KEY (`teamID`) REFERENCES `team` (`teamID`),
+  ADD CONSTRAINT `balance_win_fk` FOREIGN KEY (`win`) REFERENCES `users` (`userID`),
+  ADD CONSTRAINT `exid` FOREIGN KEY (`expenseID`) REFERENCES `expense` (`expenseID`),
   ADD CONSTRAINT `team` FOREIGN KEY (`teamID`) REFERENCES `team` (`teamID`);
 
 --
@@ -352,13 +437,6 @@ ALTER TABLE `teams_users`
 ALTER TABLE `team_expenses`
   ADD CONSTRAINT `expanse` FOREIGN KEY (`expenseID`) REFERENCES `expense` (`expenseID`) ON DELETE CASCADE,
   ADD CONSTRAINT `team_ex` FOREIGN KEY (`teamID`) REFERENCES `team` (`teamID`);
-
---
--- Constraints for table `user_expense`
---
-ALTER TABLE `user_expense`
-  ADD CONSTRAINT `expense` FOREIGN KEY (`expenseID`) REFERENCES `expense` (`expenseID`),
-  ADD CONSTRAINT `user_expense` FOREIGN KEY (`userID`) REFERENCES `users` (`userID`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

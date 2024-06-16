@@ -23,6 +23,9 @@ public class expense {
         this.paidFor = getPaidFor(expenseID);
     }
 
+    public expense(int expenseID) {
+    }
+
     public int getExpenseID() {
         return expenseID;
     }
@@ -68,14 +71,14 @@ public class expense {
     }
     
 
-    private ArrayList<User> getPaidFor(int expenseID) {
+    public List<User> getPaidFor(int expenseID) {
         ArrayList<User> paidForUsers = new ArrayList<>();
 
         String query = "SELECT u.userID, u.username, u.password " +
                        "FROM users u " +
                        "INNER JOIN `expense_users(paidfor)` eup ON u.userID = eup.userID " +
                        "WHERE eup.expenseID = ?";
-        
+
         try (Connection conn = XAMPPConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
 
