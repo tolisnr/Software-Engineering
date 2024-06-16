@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jun 16, 2024 at 04:28 PM
+-- Generation Time: Jun 16, 2024 at 06:05 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.0.30
 
@@ -41,6 +41,7 @@ CREATE TABLE `balance` (
 --
 
 INSERT INTO `balance` (`balanceID`, `teamID`, `expenseID`, `win`, `loss`, `amount`) VALUES
+('a2161ac9-2bf9-11ef-a93a-ac198eff75f2', 'd8zp5R', 37, 2, 8, 3943.5),
 ('3037cfdb-2be7-11ef-a93a-ac198eff75f2', 'Tii5jd', 36, 2, 8, 100),
 ('3039cfc4-2be7-11ef-a93a-ac198eff75f2', 'Tii5jd', 36, 2, 9, 100);
 
@@ -93,7 +94,8 @@ INSERT INTO `expense` (`expenseID`, `title`, `amount`, `date`, `payer`) VALUES
 (33, 'tower', 30, '2024-06-16', 2),
 (34, 'hotel', 300, '2024-06-16', 2),
 (35, 'hotel', 300, '2024-06-16', 9),
-(36, 'eleni', 300, '2024-06-16', 9);
+(36, 'eleni', 300, '2024-06-16', 9),
+(37, 'mpa', 7887, '2024-06-16', 2);
 
 -- --------------------------------------------------------
 
@@ -155,7 +157,9 @@ INSERT INTO `expense_users(paidfor)` (`userID`, `expenseID`) VALUES
 (2, 35),
 (9, 35),
 (8, 36),
-(9, 36);
+(9, 36),
+(2, 37),
+(8, 37);
 
 -- --------------------------------------------------------
 
@@ -181,6 +185,8 @@ INSERT INTO `owes` (`teamID`, `lossID`, `winID`, `Amount`) VALUES
 ('3pMF1o', 9, 8, 0),
 ('3pMF1o', 2, 9, 450),
 ('3pMF1o', 8, 9, 450),
+('d8zp5R', 8, 2, 3943.5),
+('d8zp5R', 2, 8, 0),
 ('EmSJ2a', 8, 2, 0),
 ('EmSJ2a', 2, 8, -2000),
 ('IdXjwu', 8, 2, 10),
@@ -232,6 +238,7 @@ CREATE TABLE `team` (
 INSERT INTO `team` (`teamID`, `title`, `category`, `admin`) VALUES
 ('8F49Ln', 'eleni', '', 2),
 ('D2WEY5', 'ts', '', 2),
+('d8zp5R', 'NEW YORK', '', 2),
 ('gltCOI', 'mmmm', 'nnn', 5),
 ('guUwMY', 'dokimi', 'fagita', 2),
 ('hY4F1F', 'test', '', 2),
@@ -267,7 +274,9 @@ INSERT INTO `teams_users` (`userID`, `teamID`) VALUES
 (8, 'Q0XfSf'),
 (2, 'Tii5jd'),
 (8, 'Tii5jd'),
-(9, 'Tii5jd');
+(9, 'Tii5jd'),
+(2, 'd8zp5R'),
+(8, 'd8zp5R');
 
 -- --------------------------------------------------------
 
@@ -285,7 +294,8 @@ CREATE TABLE `team_expenses` (
 --
 
 INSERT INTO `team_expenses` (`teamID`, `expenseID`) VALUES
-('Tii5jd', 36);
+('Tii5jd', 36),
+('d8zp5R', 37);
 
 -- --------------------------------------------------------
 
@@ -383,7 +393,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `expense`
 --
 ALTER TABLE `expense`
-  MODIFY `expenseID` int(100) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=37;
+  MODIFY `expenseID` int(100) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=38;
 
 --
 -- AUTO_INCREMENT for table `users`
@@ -402,7 +412,7 @@ ALTER TABLE `balance`
   ADD CONSTRAINT `balance_loss_fk` FOREIGN KEY (`loss`) REFERENCES `users` (`userID`),
   ADD CONSTRAINT `balance_team_fk` FOREIGN KEY (`teamID`) REFERENCES `team` (`teamID`),
   ADD CONSTRAINT `balance_win_fk` FOREIGN KEY (`win`) REFERENCES `users` (`userID`),
-  ADD CONSTRAINT `exid` FOREIGN KEY (`expenseID`) REFERENCES `expense` (`expenseID`),
+  ADD CONSTRAINT `exid` FOREIGN KEY (`expenseID`) REFERENCES `expense` (`expenseID`) ON DELETE CASCADE,
   ADD CONSTRAINT `team` FOREIGN KEY (`teamID`) REFERENCES `team` (`teamID`);
 
 --

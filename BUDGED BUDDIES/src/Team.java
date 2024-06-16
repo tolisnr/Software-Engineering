@@ -223,12 +223,13 @@ public class Team {
                     for (Integer oldUserID : oldPaidForUserIDs) {
                         if (!oldUserID.equals(oldPayerID) && !paidForUserIDs.contains(oldUserID)) {
                             String adjustOldPayerOwesQuery = "UPDATE owes SET Amount = Amount - ? WHERE teamID = ? AND winID = ? AND lossID = ?";
-                            PreparedStatement adjustOldPayerOwesStatement = conn.prepareStatement(adjustOldPayerOwesQuery);
-                            adjustOldPayerOwesStatement.setDouble(1, oldShareAmount);
-                            adjustOldPayerOwesStatement.setString(2, this.teamID);
-                            adjustOldPayerOwesStatement.setInt(3, oldPayerID);
-                            adjustOldPayerOwesStatement.setInt(4, oldUserID);
-                            adjustOldPayerOwesStatement.executeUpdate();
+                            try (PreparedStatement adjustOldPayerOwesStatement = conn.prepareStatement(adjustOldPayerOwesQuery)) {
+                                adjustOldPayerOwesStatement.setDouble(1, oldShareAmount);
+                                adjustOldPayerOwesStatement.setString(2, this.teamID);
+                                adjustOldPayerOwesStatement.setInt(3, oldPayerID);
+                                adjustOldPayerOwesStatement.setInt(4, oldUserID);
+                                adjustOldPayerOwesStatement.executeUpdate();
+                            }
                         }
                     }
                 }
