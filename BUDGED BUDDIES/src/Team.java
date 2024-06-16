@@ -189,7 +189,7 @@ public class Team {
             conn.setAutoCommit(false); // Start transaction
     
             try {
-                // Get old expense data before updating
+                // Step 1: Get old expense data before updating
                 String selectOldExpenseQuery = "SELECT amount, payer FROM expense WHERE expenseID = ?";
                 PreparedStatement selectOldExpenseStatement = conn.prepareStatement(selectOldExpenseQuery);
                 selectOldExpenseStatement.setInt(1, updatedExpense.getExpenseID());
@@ -202,7 +202,7 @@ public class Team {
                     oldPayerID = oldExpenseResultSet.getInt("payer");
                 }
     
-                // Get old paidFor users
+                // Step 2: Get old paidFor users
                 String selectOldPaidForQuery = "SELECT userID FROM `expense_users(paidfor)` WHERE expenseID = ?";
                 PreparedStatement selectOldPaidForStatement = conn.prepareStatement(selectOldPaidForQuery);
                 selectOldPaidForStatement.setInt(1, updatedExpense.getExpenseID());
@@ -213,15 +213,15 @@ public class Team {
                     oldPaidForUserIDs.add(oldPaidForResultSet.getInt("userID"));
                 }
     
-                // Calculate new share amount
+                // Step 3: Calculate old and new share amounts
                 double newShareAmount = updatedExpense.getAmount() / paidForUserIDs.size();
                 double oldShareAmount = oldAmount / oldPaidForUserIDs.size();
     
-                // Adjust old payer's owes if the payer has changed
+                // Step 4: Adjust old payer's owes if the payer has changed
                 if (oldPayerID != updatedExpense.getPayer().getUserID()) {
                     // Subtract old share amount from old payer's owes
                     for (Integer oldUserID : oldPaidForUserIDs) {
-                        if (!oldUserID.equals(oldPayerID) && !paidForUserIDs.contains(oldUserID)) {
+                        if (!oldUserID.equals(oldPayerID)) {
                             String adjustOldPayerOwesQuery = "UPDATE owes SET Amount = Amount - ? WHERE teamID = ? AND winID = ? AND lossID = ?";
                             try (PreparedStatement adjustOldPayerOwesStatement = conn.prepareStatement(adjustOldPayerOwesQuery)) {
                                 adjustOldPayerOwesStatement.setDouble(1, oldShareAmount);
@@ -234,13 +234,13 @@ public class Team {
                     }
                 }
     
-                // Delete existing entries in expense_users(paidfor) table
+                // Step 5: Delete existing entries in expense_users(paidfor) table
                 String deletePaidForQuery = "DELETE FROM `expense_users(paidfor)` WHERE expenseID = ?";
                 PreparedStatement deletePaidForStatement = conn.prepareStatement(deletePaidForQuery);
                 deletePaidForStatement.setInt(1, updatedExpense.getExpenseID());
                 deletePaidForStatement.executeUpdate();
     
-                // Insert new entries in expense_users(paidfor) table
+                // Step 6: Insert new entries in expense_users(paidfor) table
                 String insertPaidForQuery = "INSERT INTO `expense_users(paidfor)` (userID, expenseID) VALUES (?, ?)";
                 PreparedStatement insertPaidForStatement = conn.prepareStatement(insertPaidForQuery);
                 for (Integer userID : paidForUserIDs) {
@@ -249,7 +249,7 @@ public class Team {
                     insertPaidForStatement.executeUpdate();
                 }
     
-                // Update expense table
+                // Step 7: Update expense table
                 String updateExpenseQuery = "UPDATE expense SET title = ?, amount = ?, date = ?, payer = ? WHERE expenseID = ?";
                 PreparedStatement updateExpenseStatement = conn.prepareStatement(updateExpenseQuery);
                 updateExpenseStatement.setString(1, updatedExpense.getTitle());
@@ -259,9 +259,9 @@ public class Team {
                 updateExpenseStatement.setInt(5, updatedExpense.getExpenseID());
                 updateExpenseStatement.executeUpdate();
     
-                // Update or insert owes table for new expense
+                // Step 8: Update or insert owes table for new expense
                 String updateOwesQuery = "INSERT INTO owes (teamID, winID, lossID, Amount) VALUES (?, ?, ?, ?) " +
-                                         "ON DUPLICATE KEY UPDATE Amount = VALUES(Amount)";
+                                         "ON DUPLICATE KEY UPDATE Amount = Amount + VALUES(Amount)";
                 PreparedStatement updateOwesStatement = conn.prepareStatement(updateOwesQuery);
                 for (Integer lossUserID : paidForUserIDs) {
                     if (!lossUserID.equals(updatedExpense.getPayer().getUserID())) {
@@ -273,7 +273,7 @@ public class Team {
                     }
                 }
     
-                // Subtract old share amount for users no longer paid for this expense
+                // Step 9: Subtract old share amount for users no longer paid for this expense
                 for (Integer oldUserID : oldPaidForUserIDs) {
                     if (!paidForUserIDs.contains(oldUserID)) {
                         String subtractOldShareQuery = "UPDATE owes SET Amount = Amount - ? WHERE teamID = ? AND winID = ? AND lossID = ?";
@@ -286,7 +286,7 @@ public class Team {
                     }
                 }
     
-                // Commit transaction
+                // Step 10: Commit transaction
                 conn.commit();
                 System.out.println("Expense and related balances updated successfully.");
     
