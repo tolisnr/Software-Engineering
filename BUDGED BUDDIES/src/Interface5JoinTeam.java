@@ -4,98 +4,102 @@ import java.sql.*;
 import javax.swing.*;
 import javax.swing.border.*;
 
-public class Interface5JoinTeam extends JFrame{
+public class Interface5JoinTeam extends JFrame {
 
-	private JLabel text = new JLabel("Δώστε τον κωδικό της ομάδας: ");
-	private JTextField teamIDField = new JTextField();
-	private JButton OK = new JButton("OK");
-	private JButton BACK = new JButton("BACK");
-	
-	public Interface5JoinTeam(User user) {
+    private JLabel text = new JLabel("Δώστε τον κωδικό της ομάδας: ");
+    private JTextField teamIDField = new JTextField();
+    private JButton OK = new JButton("OK");
+    private JButton BACK = new JButton("BACK");
 
-		// Create background panel
-		BackgroundImageExample backgroundPanel = new BackgroundImageExample("background.jpg");
+    public Interface5JoinTeam(User user) {
 
-		// Create application icon
-		ImageIcon icon = new ImageIcon("icon.jpeg");
+        // Create background panel
+        BackgroundImageExample backgroundPanel = new BackgroundImageExample("background.jpg");
 
-		// Resize the image
-		Image resizedImage = icon.getImage().getScaledInstance(24, 24, Image.SCALE_DEFAULT);
-		ImageIcon resizedIcon = new ImageIcon(resizedImage);
+        // Create application icon
+        ImageIcon icon = new ImageIcon("icon.jpeg");
 
-		// Create a panel to hold the buttons
-		JPanel buttonPanel = new JPanel();
-		buttonPanel.setOpaque(false); // Make button panel transparent
-		buttonPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 200, 0)); // Center buttons with space between
+        // Resize the image
+        Image resizedImage = icon.getImage().getScaledInstance(24, 24, Image.SCALE_DEFAULT);
+        ImageIcon resizedIcon = new ImageIcon(resizedImage);
 
-		// Buttons Appearance
-		customizeButton(OK);
-		customizeButton(BACK);
+        // Create a panel to hold the buttons
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setOpaque(false); // Make button panel transparent
+        buttonPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 200, 0)); // Center buttons with space between
 
-		// Add buttons to the button panel
-		buttonPanel.add(OK);
-		buttonPanel.add(BACK);
+        // Buttons Appearance
+        customizeButton(OK);
+        customizeButton(BACK);
 
-		// Add text field and label to a new panel
-		JPanel textPanel = new JPanel();
-		textPanel.setOpaque(false); // Make text panel transparent
-		textPanel.add(text);
-		teamIDField.setPreferredSize(new Dimension(200, 30)); // Set preferred size
-		teamIDField.setMaximumSize(new Dimension(200, 30)); // Set maximum size
-		textPanel.add(teamIDField);
+        // Add buttons to the button panel
+        buttonPanel.add(OK);
+        buttonPanel.add(BACK);
 
-		// Create a layered pane to layer the background and the button panel
-		JLayeredPane layeredPane = new JLayeredPane();
+        // Add text field and label to a new panel
+        JPanel textPanel = new JPanel();
+        textPanel.setOpaque(false); // Make text panel transparent
+        textPanel.add(text);
+        teamIDField.setPreferredSize(new Dimension(200, 30)); // Set preferred size
+        teamIDField.setMaximumSize(new Dimension(200, 30)); // Set maximum size
+        textPanel.add(teamIDField);
 
-		// Add the background panel to the layered pane
-		backgroundPanel.setBounds(0, 0, 800, 600);
-		layeredPane.add(backgroundPanel, JLayeredPane.DEFAULT_LAYER);
+        // Create a layered pane to layer the background and the button panel
+        JLayeredPane layeredPane = new JLayeredPane();
 
-		// Add the button panel to the layered pane
-		buttonPanel.setBounds(0, 300, 800, 600);
-		layeredPane.add(buttonPanel, JLayeredPane.PALETTE_LAYER);
+        // Add the background panel to the layered pane
+        backgroundPanel.setBounds(0, 0, 800, 600);
+        layeredPane.add(backgroundPanel, JLayeredPane.DEFAULT_LAYER);
 
-		// Add the text panel to the layered pane
-		textPanel.setBounds(0, 200, 800, 600);
-		layeredPane.add(textPanel, JLayeredPane.PALETTE_LAYER);
+        // Add the button panel to the layered pane
+        buttonPanel.setBounds(0, 300, 800, 600);
+        layeredPane.add(buttonPanel, JLayeredPane.PALETTE_LAYER);
 
-		layeredPane.setPreferredSize(new Dimension(800, 600));
-		
-		OK.addActionListener(new ActionListener() {
+        // Add the text panel to the layered pane
+        textPanel.setBounds(0, 200, 800, 600);
+        layeredPane.add(textPanel, JLayeredPane.PALETTE_LAYER);
 
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				if(TeamInDataBase(teamIDField.getText()) != null) {
-					user.JoinTeam(TeamInDataBase(teamIDField.getText()));
-					TeamInDataBase(teamIDField.getText()).addUser(user);
-					new Interface4(user);
-					dispose();
-				}
-					
-			}
-			
-		});
-		
-		BACK.addActionListener(new ActionListener() {
+        layeredPane.setPreferredSize(new Dimension(800, 600));
 
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				new Interface4(user);
-				dispose();
-			}
-			
-		});
-		
-		this.setContentPane(layeredPane);
-		this.pack();
-		this.setLocationRelativeTo(null);
-		this.setIconImage(resizedIcon.getImage());
+        OK.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Team team = TeamInDataBase(teamIDField.getText());
+                if (team != null) {
+                    if (!userAlreadyInTeam(user, team)) {
+                        user.JoinTeam(team);
+                        team.addUser(user);
+                        new Interface4(user);
+                        dispose();
+                    } else {
+                        JOptionPane.showMessageDialog(null, "You are already a member of this team.");
+                    }
+                } else {
+                    JOptionPane.showMessageDialog(null, "Team not found.");
+                }
+            }
+        });
+
+        BACK.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                new Interface4(user);
+                dispose();
+            }
+        });
+
+        this.setContentPane(layeredPane);
+        this.pack();
+        this.setLocationRelativeTo(null);
+        this.setIconImage(resizedIcon.getImage());
         this.setTitle("Join Team");
-		this.setVisible(true);
+        this.setVisible(true);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-	}
-	
-	public Team TeamInDataBase(String teamID) {
+    }
+
+    public Team TeamInDataBase(String teamID) {
         try (Connection conn = XAMPPConnection.getConnection()) {
             String query = "SELECT * FROM team WHERE teamID = ?";
             PreparedStatement preparedStatement = conn.prepareStatement(query);
@@ -121,7 +125,22 @@ public class Interface5JoinTeam extends JFrame{
         }
     }
 
-	private void customizeButton(JButton button) {
+    private boolean userAlreadyInTeam(User user, Team team) {
+        try (Connection conn = XAMPPConnection.getConnection()) {
+            String query = "SELECT * FROM teams_users WHERE teamID = ? AND userID = ?";
+            PreparedStatement preparedStatement = conn.prepareStatement(query);
+            preparedStatement.setString(1, team.getTeamID());
+            preparedStatement.setInt(2, user.getUserID());
+
+            ResultSet resultSet = preparedStatement.executeQuery();
+            return resultSet.next();
+        } catch (SQLException e) {
+            System.out.println("Error while checking if user is already in the team: " + e.getMessage());
+            return false;
+        }
+    }
+
+    private void customizeButton(JButton button) {
         Dimension buttonSize = new Dimension(200, 50);
         button.setPreferredSize(buttonSize);
         button.setBackground(Color.GRAY); // Set background color
