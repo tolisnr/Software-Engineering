@@ -14,6 +14,7 @@ public class Team {
     public String title, category;
     public int userIdAdmin;
     public ArrayList<expense> expenses = new ArrayList<>();
+    public double total;
 
     public Team(String code, String title, String category, int userIdAdmin) {
         super();
@@ -21,6 +22,7 @@ public class Team {
         this.title = title;
         this.category = category;
         this.userIdAdmin = userIdAdmin;
+        this.total = 0;
     }
 
     public static Team getTeamByTitle(ArrayList<Team> teams, String title) {
@@ -141,17 +143,17 @@ public class Team {
                                     balanceStatement.setString(1, this.teamID);
                                     balanceStatement.setInt(2, aExpense.getPayer().getUserID());
                                     balanceStatement.setInt(3, lossUserID);
-                                    balanceStatement.setDouble(4, shareAmount);
+                                    balanceStatement.setDouble(4, -shareAmount);
                                     balanceStatement.setInt(5, aExpense.getExpenseID());
                                     balanceStatement.executeUpdate();
     
-                                    // Check if owes entry exists
+                                    // Check if entry exists in owes table
                                     checkOwesStatement.setString(1, this.teamID);
                                     checkOwesStatement.setInt(2, aExpense.getPayer().getUserID());
                                     checkOwesStatement.setInt(3, lossUserID);
-                                    ResultSet owesResultSet = checkOwesStatement.executeQuery();
+                                    ResultSet owesResult = checkOwesStatement.executeQuery();
     
-                                    if (owesResultSet.next()) {
+                                    if (owesResult.next()) {
                                         // Update existing owes entry
                                         updateOwesStatement.setDouble(1, shareAmount);
                                         updateOwesStatement.setString(2, this.teamID);
@@ -169,21 +171,37 @@ public class Team {
                                 }
                             }
     
-                            System.out.println("Balance and owes updated for expenseID " + aExpense.getExpenseID());
-                        } else {
-                            System.out.println("Failed to associate expense with team.");
+                            // Calculate total amount for the team from the expenses table
+                            String calculateTotalQuery = "SELECT SUM(amount) AS total FROM expense e " +
+                                    "JOIN team_expenses te ON e.expenseID = te.expenseID " +
+                                    "WHERE te.teamID = ?";
+                            PreparedStatement totalStatement = conn.prepareStatement(calculateTotalQuery);
+                            totalStatement.setString(1, this.teamID);
+                            ResultSet totalResult = totalStatement.executeQuery();
+    
+                            if (totalResult.next()) {
+                                double totalAmount = totalResult.getDouble("total");
+    
+                                // Update the team's total amount
+                                String updateTotalQuery = "UPDATE team SET total = ? WHERE teamID = ?";
+                                PreparedStatement updateTotalStatement = conn.prepareStatement(updateTotalQuery);
+                                updateTotalStatement.setDouble(1, totalAmount);
+                                updateTotalStatement.setString(2, this.teamID);
+                                updateTotalStatement.executeUpdate();
+    
+                                System.out.println("Team total updated for teamID " + this.teamID + " to " + totalAmount);
+                            }
                         }
-                    } else {
-                        System.out.println("Failed to retrieve the generated expenseID.");
                     }
                 }
-            } else {
-                System.out.println("No rows inserted into expense table.");
             }
-        } catch (SQLException e) {
-            System.out.println("Error while adding expense to the database: " + e.getMessage());
+        } catch (SQLException ex) {
+            ex.printStackTrace();
         }
     }
+    
+
+
     public void updateExpense(expense updatedExpense, List<Integer> paidForUserIDs) {
         try (Connection conn = XAMPPConnection.getConnection()) {
             conn.setAutoCommit(false); // Start transaction
@@ -259,7 +277,28 @@ public class Team {
                 updateExpenseStatement.setInt(5, updatedExpense.getExpenseID());
                 updateExpenseStatement.executeUpdate();
     
-                // Step 8: Update or insert owes table for new expense
+                // Step 8: Update team's total amount
+                String selectTeamTotalQuery = "SELECT total FROM team WHERE teamID = ?";
+                double currentTeamTotal = 0.0;
+                try (PreparedStatement selectTeamTotalStatement = conn.prepareStatement(selectTeamTotalQuery)) {
+                    selectTeamTotalStatement.setString(1, this.teamID);
+                    ResultSet teamTotalResultSet = selectTeamTotalStatement.executeQuery();
+                    if (teamTotalResultSet.next()) {
+                        currentTeamTotal = teamTotalResultSet.getDouble("total");
+                    }
+                }
+    
+                double expenseAmountDifference = updatedExpense.getAmount() - oldAmount;
+                double newTeamTotal = currentTeamTotal + expenseAmountDifference;
+    
+                String updateTeamTotalQuery = "UPDATE team SET total = ? WHERE teamID = ?";
+                try (PreparedStatement updateTeamTotalStatement = conn.prepareStatement(updateTeamTotalQuery)) {
+                    updateTeamTotalStatement.setDouble(1, newTeamTotal);
+                    updateTeamTotalStatement.setString(2, this.teamID);
+                    updateTeamTotalStatement.executeUpdate();
+                }
+    
+                // Step 9: Update or insert owes table for new expense
                 String updateOwesQuery = "INSERT INTO owes (teamID, winID, lossID, Amount) VALUES (?, ?, ?, ?) " +
                                          "ON DUPLICATE KEY UPDATE Amount = Amount + VALUES(Amount)";
                 PreparedStatement updateOwesStatement = conn.prepareStatement(updateOwesQuery);
@@ -273,7 +312,7 @@ public class Team {
                     }
                 }
     
-                // Step 9: Subtract old share amount for users no longer paid for this expense
+                // Step 10: Subtract old share amount for users no longer paid for this expense
                 for (Integer oldUserID : oldPaidForUserIDs) {
                     if (!paidForUserIDs.contains(oldUserID)) {
                         String subtractOldShareQuery = "UPDATE owes SET Amount = Amount - ? WHERE teamID = ? AND winID = ? AND lossID = ?";
@@ -286,7 +325,7 @@ public class Team {
                     }
                 }
     
-                // Step 10: Commit transaction
+                // Step 11: Commit transaction
                 conn.commit();
                 System.out.println("Expense and related balances updated successfully.");
     
@@ -298,6 +337,7 @@ public class Team {
             System.out.println("Database connection error: " + e.getMessage());
         }
     }
+    
     
     
     
@@ -425,4 +465,8 @@ public ArrayList<expense> getExpenses() {
 	public void addUser(User user){
 		Users.add(user);
 	}
+
+    public double getTotal() {
+        return total;
+    }
 }

@@ -10,7 +10,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-
 public class Interface11Balances extends JFrame {
 
     private JPanel panel = new JPanel();
@@ -26,7 +25,7 @@ public class Interface11Balances extends JFrame {
         tableModel = new DefaultTableModel(new Object[]{"Loss Username", "Win Username", "Amount"}, 0);
         balancesTable = new JTable(tableModel);
         panel.add(new JScrollPane(balancesTable), BorderLayout.CENTER);
-        panel.add(text);
+        panel.add(text, BorderLayout.NORTH); // Fixing layout issue
         panel.add(BACK, BorderLayout.SOUTH);
 
         this.setContentPane(panel);
@@ -82,6 +81,8 @@ public class Interface11Balances extends JFrame {
                 double amount = owesResultSet.getDouble("Amount");
                 String winUsername = owesResultSet.getString("winUsername");
                 String lossUsername = owesResultSet.getString("lossUsername");
+
+                System.out.println("Adding row: " + lossUsername + ", " + winUsername + ", " + amount); // Debugging
 
                 tableModel.addRow(new Object[]{lossUsername, winUsername, amount});
             }
