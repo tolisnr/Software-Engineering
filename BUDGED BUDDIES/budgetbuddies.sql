@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jun 17, 2024 at 09:30 PM
+-- Generation Time: Jun 17, 2024 at 09:48 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.0.30
 
@@ -109,7 +109,8 @@ INSERT INTO `expense` (`expenseID`, `title`, `amount`, `date`, `payer`) VALUES
 (50, 'test', 20, '2024-06-17', 2),
 (51, 'kroketes', 50, '2024-06-17', 11),
 (52, 'ko', 0, '2024-06-17', 10),
-(53, 'mpam', 0, '2024-06-17', 10);
+(53, 'mpam', 0, '2024-06-17', 10),
+(54, 'nextt', 100, '2024-06-17', 2);
 
 -- --------------------------------------------------------
 
@@ -190,7 +191,8 @@ INSERT INTO `expense_users(paidfor)` (`userID`, `expenseID`) VALUES
 (10, 51),
 (11, 51),
 (10, 52),
-(10, 53);
+(10, 53),
+(2, 54);
 
 -- --------------------------------------------------------
 
@@ -292,6 +294,7 @@ INSERT INTO `team` (`teamID`, `title`, `category`, `admin`, `total`) VALUES
 ('gltCOI', 'mmmm', 'nnn', 5, 0),
 ('guUwMY', 'dokimi', 'fagita', 2, 0),
 ('gY6hHQ', 'fuckyou', '', 2, 0),
+('hfA71B', 'zouzounia', '', 2, 100),
 ('hqfZxq', 'mpp', '', 10, 0),
 ('hY4F1F', 'test', '', 2, 0),
 ('kuK37y', 'mpa', '', 1, 0),
@@ -352,7 +355,8 @@ INSERT INTO `teams_users` (`userID`, `teamID`) VALUES
 (9, 'N40Kv9'),
 (2, 'ZXFY4Q'),
 (10, 'hqfZxq'),
-(10, 'a86Zl6');
+(10, 'a86Zl6'),
+(2, 'hfA71B');
 
 -- --------------------------------------------------------
 
@@ -380,7 +384,8 @@ INSERT INTO `team_expenses` (`teamID`, `expenseID`) VALUES
 ('pOn4DM', 49),
 ('ZXFY4Q', 50),
 ('hqfZxq', 52),
-('a86Zl6', 53);
+('a86Zl6', 53),
+('hfA71B', 54);
 
 -- --------------------------------------------------------
 
@@ -391,26 +396,25 @@ INSERT INTO `team_expenses` (`teamID`, `expenseID`) VALUES
 CREATE TABLE `users` (
   `userID` int(11) NOT NULL,
   `username` varchar(100) NOT NULL,
-  `password` varchar(100) NOT NULL,
-  `total` double NOT NULL
+  `password` varchar(100) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `users`
 --
 
-INSERT INTO `users` (`userID`, `username`, `password`, `total`) VALUES
-(1, 'eleni', 'test', 0),
-(2, 'eleni', 'tsotsou', 0),
-(3, 'maria', 'mentaki', 0),
-(4, 'maria', 'mentaki', 0),
-(5, 'm', 'k', 0),
-(6, 'evagelia', '12345', 0),
-(7, 'PAOK', '1926', 0),
-(8, 'el', 'ts', 0),
-(9, 'ma', 'me', 0),
-(10, 'tsoko', 'eleni', 0),
-(11, 'elena', 'kris', 0);
+INSERT INTO `users` (`userID`, `username`, `password`) VALUES
+(1, 'eleni', 'test'),
+(2, 'eleni', 'tsotsou'),
+(3, 'maria', 'mentaki'),
+(4, 'maria', 'mentaki'),
+(5, 'm', 'k'),
+(6, 'evagelia', '12345'),
+(7, 'PAOK', '1926'),
+(8, 'el', 'ts'),
+(9, 'ma', 'me'),
+(10, 'tsoko', 'eleni'),
+(11, 'elena', 'kris');
 
 --
 -- Indexes for dumped tables
@@ -481,7 +485,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `expense`
 --
 ALTER TABLE `expense`
-  MODIFY `expenseID` int(100) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=54;
+  MODIFY `expenseID` int(100) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=55;
 
 --
 -- AUTO_INCREMENT for table `users`
