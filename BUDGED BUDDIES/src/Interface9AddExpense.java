@@ -178,6 +178,14 @@ public class Interface9AddExpense extends JFrame {
                         return;
                     }
 
+                    
+
+                    // Check if amount is 0
+                    if (amount <= 0) {
+                        JOptionPane.showMessageDialog(null, "Please enter an amount greater than 0.");
+                        return;
+                    }
+
                     // Create new expense object
                     int expenseID = 0; // Assuming expenseID is auto-generated
                     expense newExpense = new expense(expenseID, title, amount, date, payer, paidForUsers);

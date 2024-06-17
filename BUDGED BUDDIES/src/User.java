@@ -60,6 +60,13 @@ public class User {
                 }
             }
             
+            String insertTotalsQuery = "INSERT INTO user_team_totals (userID, teamID, mytotal) VALUES (?, ?, ?)";
+            PreparedStatement insertTotalsStatement = conn.prepareStatement(insertTotalsQuery);
+            insertTotalsStatement.setInt(1, this.userID);
+            insertTotalsStatement.setString(2, team.getTeamID());
+            insertTotalsStatement.setDouble(3, 0.0); // Initial total is 0
+            insertTotalsStatement.executeUpdate();
+
             System.out.println("User joined team successfully.");
         } catch (SQLException e) {
             System.out.println("Error while joining team: " + e.getMessage());
@@ -85,6 +92,12 @@ public class User {
             // Εισάγετε τον χρήστη στην ομάδα στον πίνακα teams_users
             String insertTeamUserQuery = "INSERT INTO teams_users (teamID, userID) VALUES (?, ?)";
             PreparedStatement teamUserStatement = conn.prepareStatement(insertTeamUserQuery);
+            teamUserStatement.setString(1, group.getTeamID());
+            teamUserStatement.setInt(2, this.userID);
+            teamUserStatement.executeUpdate();
+
+            insertTeamUserQuery = "INSERT INTO teams_users (teamID, userID) VALUES (?, ?)";
+            teamUserStatement = conn.prepareStatement(insertTeamUserQuery);
             teamUserStatement.setString(1, group.getTeamID());
             teamUserStatement.setInt(2, this.userID);
             teamUserStatement.executeUpdate();
@@ -123,6 +136,7 @@ public class User {
                     }
                 }
             }
+            
         } catch (SQLException e) {
             System.out.println("Προέκυψε σφάλμα κατά την προσθήκη νέου χρήστη: " + e.getMessage());
         }

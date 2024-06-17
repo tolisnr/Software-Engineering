@@ -114,6 +114,7 @@ public class Interface7 extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 new Interface8Expenses(team, user);
+                dispose();
             }
         });
 
@@ -126,7 +127,7 @@ public class Interface7 extends JFrame {
                     JOptionPane.showMessageDialog(null, "There are no Balances.");
                 } else {
                     new Interface11Balances(team, user);
-                    dispose(); // Close Interface7 when opening Interface11Balances
+                    dispose(); 
                 }
             }
         });

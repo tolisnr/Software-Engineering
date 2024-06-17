@@ -36,47 +36,66 @@ public class Team {
 
     public boolean deleteTeam() {
         boolean success = false;
-
+    
         try (Connection conn = XAMPPConnection.getConnection()) {
+            conn.setAutoCommit(false); // Start transaction
+    
             // Delete from teams_users table
             String deleteTeamsUsersQuery = "DELETE FROM teams_users WHERE teamID = ?";
             PreparedStatement teamsUsersStatement = conn.prepareStatement(deleteTeamsUsersQuery);
             teamsUsersStatement.setString(1, this.teamID);
             teamsUsersStatement.executeUpdate();
-
-            // Delete expenses associated with the team
+    
+            // Delete expenses associated with the team, update total
+            double totalExpenseAmount = 0;
             for (expense exp : expenses) {
-                exp.deleteExpense(exp.getExpenseID());
+                totalExpenseAmount += exp.getAmount();
+                exp.deleteExpense(exp.getExpenseID()); // Assuming deleteExpense is implemented in the Expense class
             }
-
+    
             // Delete from team_expenses table
             String deleteTeamExpensesQuery = "DELETE FROM team_expenses WHERE teamID = ?";
             PreparedStatement teamExpensesStatement = conn.prepareStatement(deleteTeamExpensesQuery);
             teamExpensesStatement.setString(1, this.teamID);
             teamExpensesStatement.executeUpdate();
-
+    
+            // Update team total in team table
+            String updateTeamTotalQuery = "UPDATE team SET total = total - ? WHERE teamID = ?";
+            PreparedStatement updateTeamStatement = conn.prepareStatement(updateTeamTotalQuery);
+            updateTeamStatement.setDouble(1, totalExpenseAmount);
+            updateTeamStatement.setString(2, this.teamID);
+            updateTeamStatement.executeUpdate();
+    
             // Delete from balance table (assuming balance table is related to team)
             String deleteBalanceQuery = "DELETE FROM balance WHERE teamID = ?";
             PreparedStatement balanceStatement = conn.prepareStatement(deleteBalanceQuery);
             balanceStatement.setString(1, this.teamID);
             balanceStatement.executeUpdate();
-
+    
             // Delete from team table
             String deleteTeamQuery = "DELETE FROM team WHERE teamID = ?";
             PreparedStatement teamStatement = conn.prepareStatement(deleteTeamQuery);
             teamStatement.setString(1, this.teamID);
             int rowsDeleted = teamStatement.executeUpdate();
-
+    
             if (rowsDeleted > 0) {
                 success = true;
             }
-
+    
+            conn.commit(); // Commit transaction if successful
         } catch (SQLException e) {
             System.out.println("Error deleting team: " + e.getMessage());
+            try {
+                conn.rollback(); // Rollback transaction on error
+            } catch (SQLException e1) {
+                System.out.println("Error rolling back transaction: " + e1.getMessage());
+            }
         }
-
+    
         return success;
     }
+
+
     public void addExpense(expense aExpense, List<Integer> paidForUserIDs) {
         expenses.add(aExpense); // Assuming this is updating an in-memory list
     
@@ -190,6 +209,39 @@ public class Team {
                                 updateTotalStatement.executeUpdate();
     
                                 System.out.println("Team total updated for teamID " + this.teamID + " to " + totalAmount);
+                            }
+                        }
+                        for (Integer paidUserID : paidForUserIDs) {
+                            double shareAmount = aExpense.getAmount() / paidForUserIDs.size();
+                
+                            // Check if user_team_totals entry exists for this user and team
+                            String checkTotalsQuery = "SELECT mytotal FROM user_team_totals WHERE userID = ? AND teamID = ?";
+                            PreparedStatement checkTotalsStatement = conn.prepareStatement(checkTotalsQuery);
+                            checkTotalsStatement.setInt(1, paidUserID);
+                            checkTotalsStatement.setString(2, this.teamID);
+                
+                            ResultSet totalsResult = checkTotalsStatement.executeQuery();
+                
+                            if (totalsResult.next()) {
+                                // Update existing entry
+                                double currentTotal = totalsResult.getDouble("mytotal");
+                                double newTotal = currentTotal + shareAmount;
+                
+                                String updateTotalsQuery = "UPDATE user_team_totals SET mytotal = ? WHERE userID = ? AND teamID = ?";
+                                PreparedStatement updateTotalsStatement = conn.prepareStatement(updateTotalsQuery);
+                                updateTotalsStatement.setDouble(1, newTotal);
+                                updateTotalsStatement.setInt(2, paidUserID);
+                                updateTotalsStatement.setString(3, this.teamID);
+                                updateTotalsStatement.executeUpdate();
+                
+                            } else {
+                                // Insert new entry
+                                String insertTotalsQuery = "INSERT INTO user_team_totals (userID, teamID, mytotal) VALUES (?, ?, ?)";
+                                PreparedStatement insertTotalsStatement = conn.prepareStatement(insertTotalsQuery);
+                                insertTotalsStatement.setInt(1, paidUserID);
+                                insertTotalsStatement.setString(2, this.teamID);
+                                insertTotalsStatement.setDouble(3, shareAmount);
+                                insertTotalsStatement.executeUpdate();
                             }
                         }
                     }

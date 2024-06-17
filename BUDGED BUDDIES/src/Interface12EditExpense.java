@@ -196,6 +196,11 @@ public class Interface12EditExpense extends JFrame {
                         JOptionPane.showMessageDialog(null, "Please select at least one user for whom the expense is paid.");
                         return;
                     }
+                    
+                    if (amount <= 0) {
+                        JOptionPane.showMessageDialog(null, "Please enter an amount greater than 0.");
+                        return;
+                    }
 
                     // Update existing expense object with new data
                     existingExpense.setTitle(title);
@@ -277,21 +282,5 @@ public class Interface12EditExpense extends JFrame {
         textField.setCaretColor(Color.BLACK); // Set caret (cursor) color
     }
 
-    public static void main(String[] args) {
-        // Example usage
-        Team team = new Team("TeamID", "Team Title", "Category", 1);
-        User user = new User("username", "password", 1);
-        List<User> users = new ArrayList<>();
-        users.add(new User("User1", "password", 1));
-        users.add(new User("User2", "password", 2));
-        users.add(new User("User3", "password", 3));
-        expense existingExpense = new expense(1, "Expense Title", 100.0, new Date(), users.get(0), users.subList(0, 2));
-
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                new Interface12EditExpense(team, user, existingExpense);
-            }
-        });
-    }
+    
 }
