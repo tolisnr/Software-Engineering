@@ -98,7 +98,7 @@ public class User {
     }
 
     public void InsertUserinDataBase(User user) {
-        String url = "jdbc:mysql://localhost:3306/budgedbuddies"; // Το URL της βάσης δεδομένων σας
+        String url = "jdbc:mysql://localhost:3306/budgetbuddies"; // Το URL της βάσης δεδομένων σας
         String username = "root"; // Το όνομα χρήστη της βάσης δεδομένων
         String password = ""; // Ο κωδικός πρόσβασης στη βάση δεδομένων
 
@@ -129,7 +129,7 @@ public class User {
     }
 
     public boolean doesUserExist(String username) {
-        String url = "jdbc:mysql://localhost:3306/budgedbuddies"; // Το URL της βάσης δεδομένων σας
+        String url = "jdbc:mysql://localhost:3306/budgetbuddies"; // Το URL της βάσης δεδομένων σας
         String dbUsername = "root"; // Το όνομα χρήστη της βάσης δεδομένων
         String dbPassword = ""; // Ο κωδικός πρόσβασης στη βάση δεδομένων
 
