@@ -40,7 +40,7 @@ public class Interface12EditExpense extends JFrame {
         // Resize the image
         Image resizedImage = icon.getImage().getScaledInstance(24, 24, Image.SCALE_DEFAULT);
         ImageIcon resizedIcon = new ImageIcon(resizedImage);
-
+        
         List<User> teamUsers = team.getUsers();
         List<String> userNames = new ArrayList<>();
         for (User u : teamUsers) {
@@ -69,13 +69,14 @@ public class Interface12EditExpense extends JFrame {
         customizeButton(saveButton);
         customizeButton(BACK, new Dimension(100, 30));
 
-        titleField = new JTextField();
+        titleField = new JTextField(existingExpense.getTitle());
         customizeTextField(titleField);
 
-        amountField = new JTextField();
+        amountField = new JTextField(String.valueOf(existingExpense.getAmount()));
         customizeTextField(amountField);
 
         dateSpinner = new JSpinner(new SpinnerDateModel());
+        dateSpinner.setValue(existingExpense.getDate());
         customizeComponent(dateSpinner);
 
         // Customize font for labels and text fields
@@ -145,6 +146,24 @@ public class Interface12EditExpense extends JFrame {
         payerList.setFont(new Font("Arial", Font.PLAIN, 16));
         paidForPanel.setFont(new Font("Arial", Font.PLAIN, 16));
 
+        // Preselect payer in the list if valid
+        User payer = existingExpense.getPayer();
+        if (payer != null) {
+            int payerIndex = teamUsers.indexOf(payer);
+            if (payerIndex != -1) {
+                payerList.setSelectedIndex(payerIndex);
+            }
+        }
+
+        // Preselect paidFor checkboxes based on existing expense
+        List<User> paidForUsers = existingExpense.getPaidFor();
+        for (User paidForUser : paidForUsers) {
+            int index = teamUsers.indexOf(paidForUser);
+            if (index != -1 && index < paidForCheckboxes.size()) {
+                paidForCheckboxes.get(index).setSelected(true);
+            }
+        }
+
         saveButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -200,7 +219,6 @@ public class Interface12EditExpense extends JFrame {
             }
         });
 
-
         BACK.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -218,7 +236,7 @@ public class Interface12EditExpense extends JFrame {
         backgroundPanel.add(saveButton, BorderLayout.SOUTH);
 
         // Set up the frame
-        setTitle("Add Expense");
+        setTitle("Edit Expense");
         setSize(800, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null); // Center the frame
