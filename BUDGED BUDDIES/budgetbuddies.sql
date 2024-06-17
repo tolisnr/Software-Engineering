@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jun 17, 2024 at 09:22 PM
+-- Generation Time: Jun 17, 2024 at 09:30 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.0.30
 
@@ -274,7 +274,7 @@ CREATE TABLE `team` (
   `title` varchar(100) NOT NULL,
   `category` varchar(100) NOT NULL,
   `admin` int(11) NOT NULL,
-  `total` double NOT NULL
+  `total` double NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
