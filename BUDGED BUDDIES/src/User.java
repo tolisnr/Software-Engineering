@@ -95,12 +95,13 @@ public class User {
             teamUserStatement.setString(1, group.getTeamID());
             teamUserStatement.setInt(2, this.userID);
             teamUserStatement.executeUpdate();
-
-            insertTeamUserQuery = "INSERT INTO teams_users (teamID, userID) VALUES (?, ?)";
-            teamUserStatement = conn.prepareStatement(insertTeamUserQuery);
-            teamUserStatement.setString(1, group.getTeamID());
-            teamUserStatement.setInt(2, this.userID);
-            teamUserStatement.executeUpdate();
+            
+            String insertTotalsQuery = "INSERT INTO user_team_totals (userID, teamID, mytotal) VALUES (?, ?, ?)";
+            PreparedStatement insertTotalsStatement = conn.prepareStatement(insertTotalsQuery);
+            insertTotalsStatement.setInt(1, this.userID);
+            insertTotalsStatement.setString(2, group.getTeamID());
+            insertTotalsStatement.setDouble(3, 0.0); // Initial total is 0
+            insertTotalsStatement.executeUpdate();
 
             System.out.println("Team created and added to the database.");
         } catch (SQLException e) {

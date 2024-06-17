@@ -58,7 +58,12 @@ public class Team {
             PreparedStatement teamExpensesStatement = conn.prepareStatement(deleteTeamExpensesQuery);
             teamExpensesStatement.setString(1, this.teamID);
             teamExpensesStatement.executeUpdate();
-    
+            
+            String deleteUserTotalsQuery = "DELETE FROM user_team_totals WHERE teamID = ?";
+            PreparedStatement deleteUserTotalsStatement = conn.prepareStatement(deleteUserTotalsQuery);
+            deleteUserTotalsStatement.setString(1, teamID);
+            deleteUserTotalsStatement.executeUpdate();
+
             // Update team total in team table
             String updateTeamTotalQuery = "UPDATE team SET total = total - ? WHERE teamID = ?";
             PreparedStatement updateTeamStatement = conn.prepareStatement(updateTeamTotalQuery);
@@ -85,7 +90,7 @@ public class Team {
             conn.commit(); // Commit transaction if successful
         } catch (SQLException e) {
             System.out.println("Error deleting team: " + e.getMessage());
-            try {
+            try (Connection conn = XAMPPConnection.getConnection()){
                 conn.rollback(); // Rollback transaction on error
             } catch (SQLException e1) {
                 System.out.println("Error rolling back transaction: " + e1.getMessage());
@@ -377,6 +382,28 @@ public class Team {
                     }
                 }
     
+                // New Step: Remove the previous share amount from `mytotal` for everyone in the old paid-for list
+                String updateUserTotalRemoveOldQuery = "UPDATE user_team_totals SET mytotal = mytotal - ? WHERE teamID = ? AND userID = ?";
+                try (PreparedStatement updateUserTotalRemoveOldStatement = conn.prepareStatement(updateUserTotalRemoveOldQuery)) {
+                    for (Integer oldUserID : oldPaidForUserIDs) {
+                        updateUserTotalRemoveOldStatement.setDouble(1, oldShareAmount);
+                        updateUserTotalRemoveOldStatement.setString(2, this.teamID);
+                        updateUserTotalRemoveOldStatement.setInt(3, oldUserID);
+                        updateUserTotalRemoveOldStatement.executeUpdate();
+                    }
+                }
+    
+                // New Step: Add the new share amount to `mytotal` for everyone in the new paid-for list
+                String updateUserTotalAddNewQuery = "UPDATE user_team_totals SET mytotal = mytotal + ? WHERE teamID = ? AND userID = ?";
+                try (PreparedStatement updateUserTotalAddNewStatement = conn.prepareStatement(updateUserTotalAddNewQuery)) {
+                    for (Integer newUserID : paidForUserIDs) {
+                        updateUserTotalAddNewStatement.setDouble(1, newShareAmount);
+                        updateUserTotalAddNewStatement.setString(2, this.teamID);
+                        updateUserTotalAddNewStatement.setInt(3, newUserID);
+                        updateUserTotalAddNewStatement.executeUpdate();
+                    }
+                }
+    
                 // Step 11: Commit transaction
                 conn.commit();
                 System.out.println("Expense and related balances updated successfully.");
@@ -389,11 +416,7 @@ public class Team {
             System.out.println("Database connection error: " + e.getMessage());
         }
     }
-    
-    
-    
-    
-    
+     
     public ArrayList<User> getUsers() {
         ArrayList<User> users = new ArrayList<>();
 
