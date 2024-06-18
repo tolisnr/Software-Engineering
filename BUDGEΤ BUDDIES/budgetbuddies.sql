@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jun 17, 2024 at 10:44 PM
+-- Generation Time: Jun 18, 2024 at 12:06 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.0.30
 
@@ -35,19 +35,6 @@ CREATE TABLE `balance` (
   `loss` int(11) NOT NULL,
   `amount` double NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `balance`
---
-
-INSERT INTO `balance` (`balanceID`, `teamID`, `expenseID`, `win`, `loss`, `amount`) VALUES
-('1868ebeb-2c01-11ef-a93a-ac198eff75f2', '2ih690', 47, 2, 8, 10),
-('9d225b25-2c00-11ef-a93a-ac198eff75f2', 'gY6hHQ', 45, 2, 8, 10),
-('b504ff3e-2c09-11ef-a93a-ac198eff75f2', 'pOn4DM', 49, 8, 2, 50),
-('c63b1299-2bfc-11ef-a93a-ac198eff75f2', 'RhIPMy', 41, 2, 8, 20.5),
-('3037cfdb-2be7-11ef-a93a-ac198eff75f2', 'Tii5jd', 36, 2, 8, 100),
-('3039cfc4-2be7-11ef-a93a-ac198eff75f2', 'Tii5jd', 36, 2, 9, 100),
-('54f502fb-2bfd-11ef-a93a-ac198eff75f2', 'ZtEY2o', 43, 2, 8, 10);
 
 -- --------------------------------------------------------
 
@@ -114,7 +101,12 @@ INSERT INTO `expense` (`expenseID`, `title`, `amount`, `date`, `payer`) VALUES
 (57, 'd', 0, '2024-06-17', 9),
 (58, 'sd', 0, '2024-06-17', 12),
 (59, 'cac', 0, '2024-06-17', 12),
-(60, 'sdcs', 10, '2024-06-17', 12);
+(60, 'sdcs', 10, '2024-06-17', 12),
+(61, 'asdc', 100, '2024-06-17', 12),
+(62, 'kopa', 10, '2024-06-17', 12),
+(64, 'cwds', 100, '2024-06-18', 12),
+(66, 'dscvd', 100, '2024-06-18', 12),
+(67, 'vrefv', 40, '2024-06-18', 9);
 
 -- --------------------------------------------------------
 
@@ -126,81 +118,6 @@ CREATE TABLE `expense_users(paidfor)` (
   `userID` int(11) NOT NULL,
   `expenseID` int(100) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `expense_users(paidfor)`
---
-
-INSERT INTO `expense_users(paidfor)` (`userID`, `expenseID`) VALUES
-(8, 10),
-(2, 11),
-(8, 11),
-(8, 12),
-(8, 14),
-(2, 15),
-(8, 15),
-(8, 18),
-(2, 19),
-(8, 19),
-(8, 21),
-(2, 21),
-(2, 22),
-(8, 22),
-(2, 23),
-(8, 23),
-(2, 24),
-(8, 24),
-(2, 25),
-(8, 25),
-(8, 26),
-(2, 26),
-(8, 27),
-(9, 27),
-(8, 28),
-(9, 28),
-(2, 29),
-(8, 29),
-(9, 29),
-(2, 30),
-(8, 30),
-(9, 30),
-(2, 31),
-(8, 31),
-(9, 31),
-(2, 32),
-(8, 32),
-(2, 33),
-(9, 33),
-(2, 34),
-(8, 34),
-(2, 35),
-(9, 35),
-(8, 36),
-(9, 36),
-(2, 40),
-(8, 40),
-(2, 41),
-(8, 41),
-(2, 42),
-(8, 42),
-(2, 43),
-(8, 43),
-(2, 45),
-(8, 45),
-(2, 47),
-(8, 47),
-(2, 50),
-(10, 51),
-(11, 51),
-(10, 52),
-(10, 53),
-(2, 54),
-(9, 57),
-(2, 49),
-(8, 49),
-(12, 58),
-(12, 59),
-(12, 60);
 
 -- --------------------------------------------------------
 
@@ -214,64 +131,6 @@ CREATE TABLE `owes` (
   `winID` int(11) NOT NULL,
   `Amount` double NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `owes`
---
-
-INSERT INTO `owes` (`teamID`, `lossID`, `winID`, `Amount`) VALUES
-('2ih690', 8, 2, 5),
-('2ih690', 2, 8, 0),
-('3pMF1o', 8, 2, -36088.16666666667),
-('3pMF1o', 9, 2, 433.3333333333333),
-('3pMF1o', 2, 8, 0),
-('3pMF1o', 9, 8, 0),
-('3pMF1o', 2, 9, 450),
-('3pMF1o', 8, 9, 450),
-('4dXUN1', 8, 2, 0),
-('4dXUN1', 2, 8, 0),
-('9rflVj', 11, 10, 0),
-('9rflVj', 10, 11, 25),
-('d8zp5R', 8, 2, -32578),
-('d8zp5R', 2, 8, 0),
-('EmSJ2a', 8, 2, -36521.5),
-('EmSJ2a', 2, 8, -2000),
-('gY6hHQ', 8, 2, 10),
-('gY6hHQ', 2, 8, 0),
-('IdXjwu', 8, 2, -36511.5),
-('IdXjwu', 9, 2, 15),
-('IdXjwu', 2, 8, 0),
-('IdXjwu', 9, 8, 0),
-('IdXjwu', 2, 9, 0),
-('IdXjwu', 8, 9, 0),
-('j2SzY7', 9, 8, 0),
-('j2SzY7', 8, 9, 0),
-('le2E7E', 8, 2, -36521.5),
-('le2E7E', 9, 2, 150),
-('le2E7E', 2, 8, 0),
-('le2E7E', 9, 8, 0),
-('le2E7E', 2, 9, 150),
-('le2E7E', 8, 9, 0),
-('pOn4DM', 8, 2, 0),
-('pOn4DM', 2, 8, 0),
-('RhIPMy', 8, 2, 20.5),
-('RhIPMy', 2, 8, 0),
-('SYJx0C', 8, 2, -36371.5),
-('SYJx0C', 9, 2, 100),
-('SYJx0C', 2, 8, 0),
-('SYJx0C', 9, 8, 0),
-('SYJx0C', 2, 9, 0),
-('SYJx0C', 8, 9, 0),
-('Tii5jd', 8, 2, -36421.5),
-('Tii5jd', 9, 2, 100),
-('Tii5jd', 2, 8, 0),
-('Tii5jd', 9, 8, 0),
-('Tii5jd', 2, 9, 0),
-('Tii5jd', 8, 9, 150),
-('UVHuOg', 8, 2, -36541.5),
-('UVHuOg', 2, 8, 0),
-('ZtEY2o', 8, 2, 10),
-('ZtEY2o', 2, 8, 0);
 
 -- --------------------------------------------------------
 
@@ -295,20 +154,24 @@ INSERT INTO `team` (`teamID`, `title`, `category`, `admin`, `total`) VALUES
 ('2ih690', 'fuck', '', 2, 0),
 ('49I2nw', 'eleni', '', 2, 0),
 ('4dXUN1', 'maroko', '', 2, 0),
+('7eDjW5', 'dd', '', 12, 0),
 ('7KIXeb', 'dcs', '', 12, 0),
 ('8F49Ln', 'eleni', '', 2, 0),
 ('a86Zl6', 'oust', '', 10, 0),
 ('aL9DKE', 'new', '', 8, 0),
+('blZt9U', 'lefta', '', 12, 110),
 ('CgRvO5', 'papia', '', 9, 0),
 ('D2WEY5', 'ts', '', 2, 0),
 ('d8zp5R', 'NEW YORK', '', 2, 0),
 ('gltCOI', 'mmmm', 'nnn', 5, 0),
+('GpVNGJ', 'fccswdcf', '', 12, 140),
 ('guUwMY', 'dokimi', 'fagita', 2, 0),
 ('gY6hHQ', 'fuckyou', '', 2, 0),
 ('hfA71B', 'zouzounia', '', 2, 100),
 ('hMNtgm', 'dc', '', 12, 0),
 ('hqfZxq', 'mpp', '', 10, 0),
 ('hY4F1F', 'test', '', 2, 0),
+('iBO4QM', 'dd', '', 12, 0),
 ('kuK37y', 'mpa', '', 1, 0),
 ('kuwH7E', 'sgfayd', '', 6, 0),
 ('N40Kv9', 'sangai', '', 9, 0),
@@ -316,7 +179,9 @@ INSERT INTO `team` (`teamID`, `title`, `category`, `admin`, `total`) VALUES
 ('pOn4DM', 'zom', '', 2, -100),
 ('Q0XfSf', 'paris', '', 8, 0),
 ('RhIPMy', 'test', '', 2, 0),
+('rZB77T', 'cdascsad', '', 12, 300),
 ('Tii5jd', 'paris', '', 2, 0),
+('tkI6i9', 'pp', '', 12, 0),
 ('zN14nf', 'xqx', '', 12, 10),
 ('ZtEY2o', 'delete', '', 2, 0),
 ('ZXFY4Q', 'panel', '', 2, 0);
@@ -332,50 +197,6 @@ CREATE TABLE `teams_users` (
   `teamID` varchar(6) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Dumping data for table `teams_users`
---
-
-INSERT INTO `teams_users` (`userID`, `teamID`) VALUES
-(1, 'kuK37y'),
-(5, 'gltCOI'),
-(6, 'kuwH7E'),
-(7, 'NLRn8x'),
-(2, '8F49Ln'),
-(2, 'D2WEY5'),
-(2, 'guUwMY'),
-(8, 'Q0XfSf'),
-(2, 'Tii5jd'),
-(8, 'Tii5jd'),
-(9, 'Tii5jd'),
-(2, 'd8zp5R'),
-(8, 'd8zp5R'),
-(2, '4dXUN1'),
-(8, '4dXUN1'),
-(2, 'RhIPMy'),
-(8, 'RhIPMy'),
-(2, 'ZtEY2o'),
-(8, 'ZtEY2o'),
-(2, 'gY6hHQ'),
-(8, 'gY6hHQ'),
-(2, '2ih690'),
-(8, '2ih690'),
-(2, 'pOn4DM'),
-(8, 'pOn4DM'),
-(2, '49I2nw'),
-(2, 'gY6hHQ'),
-(9, 'N40Kv9'),
-(9, 'N40Kv9'),
-(2, 'ZXFY4Q'),
-(10, 'hqfZxq'),
-(10, 'a86Zl6'),
-(2, 'hfA71B'),
-(8, 'aL9DKE'),
-(9, 'CgRvO5'),
-(12, 'hMNtgm'),
-(12, '7KIXeb'),
-(12, 'zN14nf');
-
 -- --------------------------------------------------------
 
 --
@@ -386,28 +207,6 @@ CREATE TABLE `team_expenses` (
   `teamID` varchar(6) NOT NULL,
   `expenseID` int(100) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `team_expenses`
---
-
-INSERT INTO `team_expenses` (`teamID`, `expenseID`) VALUES
-('Tii5jd', 36),
-('4dXUN1', 40),
-('RhIPMy', 41),
-('RhIPMy', 42),
-('ZtEY2o', 43),
-('gY6hHQ', 45),
-('2ih690', 47),
-('pOn4DM', 49),
-('ZXFY4Q', 50),
-('hqfZxq', 52),
-('a86Zl6', 53),
-('hfA71B', 54),
-('CgRvO5', 57),
-('hMNtgm', 58),
-('7KIXeb', 59),
-('zN14nf', 60);
 
 -- --------------------------------------------------------
 
@@ -527,7 +326,7 @@ ALTER TABLE `user_team_totals`
 -- AUTO_INCREMENT for table `expense`
 --
 ALTER TABLE `expense`
-  MODIFY `expenseID` int(100) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=61;
+  MODIFY `expenseID` int(100) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=68;
 
 --
 -- AUTO_INCREMENT for table `users`
