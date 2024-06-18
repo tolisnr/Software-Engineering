@@ -5,10 +5,10 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-
 import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.border.LineBorder;
+
 
 
 public class Interface7 extends JFrame {
@@ -22,23 +22,13 @@ public class Interface7 extends JFrame {
         // Create a panel with transparent background image
         TransparentBackgroundPanel backgroundPanel = new TransparentBackgroundPanel("background.jpg");
 
-        //Create application icon
+        // Create application icon
         ImageIcon icon = new ImageIcon("icon.jpeg");
 
         // Resize the image
         Image resizedImage = icon.getImage().getScaledInstance(24, 24, Image.SCALE_DEFAULT);
         ImageIcon resizedIcon = new ImageIcon(resizedImage);
 
-        /* // Create a panel for the back button and add it to the north
-        JPanel backButtonPanel = new JPanel();
-        backButtonPanel.setOpaque(false); // Make back button panel transparent
-        backButtonPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
-        customizeButton(BACK);
-        Dimension buttonSize = new Dimension(70, 30);
-        BACK.setPreferredSize(buttonSize);
-        backButtonPanel.add(BACK); */
-
-        //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         // Create a panel for the back button and add it to the north
         JPanel backButtonPanel = new JPanel();
         backButtonPanel.setOpaque(false); // Make back button panel transparent
@@ -64,18 +54,50 @@ public class Interface7 extends JFrame {
         teamIDPanel.add(teamIDLabel);
         teamIDPanel.add(teamIDField);
         backButtonPanel.add(teamIDPanel, BorderLayout.EAST);
-        //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
         // Create a panel to hold the center buttons
         JPanel centerButtonPanel = new JPanel(new GridBagLayout());
         centerButtonPanel.setOpaque(false); // Make center button panel transparent
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(150, 100, 0, 100);
+        gbc.insets = new Insets(10, 100, 10, 100);
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.gridwidth = 2;
+
+        JLabel teamTotalLabel = new JLabel("TEAM TOTAL:");
+        JLabel myTotalLabel = new JLabel("MY TOTAL:");
+        JTextField teamTotalField = new JTextField(10);
+        JTextField myTotalField = new JTextField(10);
+        teamTotalField.setEditable(false); // Make the text field non-editable
+        myTotalField.setEditable(false); // Make the text field non-editable
+        customizeLabel(teamTotalLabel);
+        customizeTextField(teamTotalField);
+        customizeLabel(myTotalLabel);
+        customizeTextField(myTotalField);
+
+        teamTotalField.setText(Double.toString(team.getTotal(team.getTeamID())));
+        myTotalField.setText(Double.toString(user.getMyTotal(team.getTeamID())));
+        
+
+        // Add the teamTotalLabel and teamTotalField to the centerButtonPanel
+        JPanel totalPanel = new JPanel(new FlowLayout());
+        totalPanel.setOpaque(false);
+        totalPanel.add(teamTotalLabel);
+        totalPanel.add(teamTotalField);
+        totalPanel.add(myTotalLabel);
+        totalPanel.add(myTotalField);
+        centerButtonPanel.add(totalPanel, gbc);
+
+        gbc.gridy++;
+        gbc.gridwidth = 1;
         customizeButton(Expenses);
         centerButtonPanel.add(Expenses, gbc);
+
+        gbc.gridx++;
         customizeButton(Balances);
         centerButtonPanel.add(Balances, gbc);
 
-        //Create a panel for the delete team button and add it to the south
+        // Create a panel for the delete team button and add it to the south
         JPanel deleteButtonPanel = new JPanel();
         deleteButtonPanel.setOpaque(false);
         customizeButton(DeleteTeam);
@@ -127,7 +149,7 @@ public class Interface7 extends JFrame {
                     JOptionPane.showMessageDialog(null, "There are no Balances.");
                 } else {
                     new Interface11Balances(team, user);
-                    dispose(); 
+                    dispose(); // Close Interface7 when opening Interface11Balances
                 }
             }
         });
@@ -183,21 +205,21 @@ public class Interface7 extends JFrame {
     }
 
     private boolean checkNonZeroOwes(Team team) {
-    boolean hasNonZeroOwes = false;
+        boolean hasNonZeroOwes = false;
 
-    try (Connection conn = XAMPPConnection.getConnection()) {
-        String selectOwesQuery = "SELECT COUNT(*) AS nonZeroCount FROM owes WHERE teamID = ? AND Amount <> 0";
-        PreparedStatement selectOwesStatement = conn.prepareStatement(selectOwesQuery);
-        selectOwesStatement.setString(1, team.getTeamID()); // Assuming getTeamID() retrieves the team's ID
+        try (Connection conn = XAMPPConnection.getConnection()) {
+            String selectOwesQuery = "SELECT COUNT(*) AS nonZeroCount FROM owes WHERE teamID = ? AND Amount <> 0";
+            PreparedStatement selectOwesStatement = conn.prepareStatement(selectOwesQuery);
+            selectOwesStatement.setString(1, team.getTeamID()); // Assuming getTeamID() retrieves the team's ID
 
-        ResultSet owesResultSet = selectOwesStatement.executeQuery();
-        if (owesResultSet.next()) {
-            int nonZeroCount = owesResultSet.getInt("nonZeroCount");
-            hasNonZeroOwes = nonZeroCount > 0;
+            ResultSet owesResultSet = selectOwesStatement.executeQuery();
+            if (owesResultSet.next()) {
+                int nonZeroCount = owesResultSet.getInt("nonZeroCount");
+                hasNonZeroOwes = nonZeroCount > 0;
+            }
+        } catch (SQLException ex) {
+            System.out.println("Error checking non-zero owes: " + ex.getMessage());
         }
-    } catch (SQLException ex) {
-        System.out.println("Error checking non-zero owes: " + ex.getMessage());
-    }
 
         return hasNonZeroOwes;
     }

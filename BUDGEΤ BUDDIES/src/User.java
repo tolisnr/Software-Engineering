@@ -5,7 +5,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Random;
-
 import javax.swing.JOptionPane;
 
 public class User {
@@ -13,6 +12,7 @@ public class User {
     public String username;
     public String password;
     public ArrayList<Team> Teams = new ArrayList<>();
+    public double mytotal;
 
     public User(String name, String password, int userID) {
         this.username = name;
@@ -112,7 +112,7 @@ public class User {
     }
 
     public void InsertUserinDataBase(User user) {
-        String url = "jdbc:mysql://localhost:3306/budgetbuddies"; // Το URL της βάσης δεδομένων σας
+        String url = "jdbc:mysql://localhost:3306/budgetbuddy"; // Το URL της βάσης δεδομένων σας
         String username = "root"; // Το όνομα χρήστη της βάσης δεδομένων
         String password = ""; // Ο κωδικός πρόσβασης στη βάση δεδομένων
 
@@ -144,7 +144,7 @@ public class User {
     }
 
     public boolean doesUserExist(String username) {
-        String url = "jdbc:mysql://localhost:3306/budgetbuddies"; // Το URL της βάσης δεδομένων σας
+        String url = "jdbc:mysql://localhost:3306/budgetbuddy"; // Το URL της βάσης δεδομένων σας
         String dbUsername = "root"; // Το όνομα χρήστη της βάσης δεδομένων
         String dbPassword = ""; // Ο κωδικός πρόσβασης στη βάση δεδομένων
 
@@ -209,6 +209,46 @@ public class User {
         }
 
         return teams;
+    }
+
+    public double getMyTotal(String teamID) {
+        double total = 0.0;
+        Connection conn = null;
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+
+        try {
+            // JDBC connection setup (replace with your database credentials)
+            String jdbcUrl = "jdbc:mysql://localhost:3306/budgetbuddy";
+            String user = "root";
+            String password = "";
+            conn = DriverManager.getConnection(jdbcUrl, user, password);
+
+            // SQL query to fetch mytotal for this user and teamID
+            String sql = "SELECT mytotal FROM user_team_totals WHERE userID = ? AND teamID = ?";
+            stmt = conn.prepareStatement(sql);
+            stmt.setInt(1, this.userID);
+            stmt.setString(2, teamID);
+            rs = stmt.executeQuery();
+
+            // Process the result if found
+            if (rs.next()) {
+                total = rs.getDouble("mytotal");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            // Close connections
+            try {
+                if (rs != null) rs.close();
+                if (stmt != null) stmt.close();
+                if (conn != null) conn.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+        
+        return total;
     }
 
     public int getUserID() {

@@ -15,7 +15,7 @@ public class expense {
     private User payer;
     private List<User> paidFor;
 
-    private static final String URL = "jdbc:mysql://localhost:3306/budgetbuddies";
+    private static final String URL = "jdbc:mysql://localhost:3306/budgetbuddy";
     private static final String USERNAME = "root";
     private static final String PASSWORD = "";
 
@@ -107,7 +107,7 @@ public class expense {
 
     private List<Integer> getUsersInvolvedInExpense(Connection conn, int expenseID) throws SQLException {
         List<Integer> usersInvolved = new ArrayList<>();
-        String query = "SELECT userID FROM `expense_users(paidfor)` WHERE expenseID = ?";
+        String query = "SELECT userID FROM `expense_users_paidfor` WHERE expenseID = ?";
 
         try (PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setInt(1, expenseID);
@@ -166,6 +166,14 @@ public class expense {
                 stmt.executeUpdate();
             }
         }
+
+        String query1 = "UPDATE team SET total = total - ? WHERE teamID = ?";
+
+        try (PreparedStatement stmt = conn.prepareStatement(query1)) {
+                stmt.setDouble(1, amount);
+                stmt.setString(2, teamID);
+                stmt.executeUpdate();
+        }
     }
 
     private void deleteExpenseRecord(Connection conn, int expenseID) throws SQLException {
@@ -180,7 +188,7 @@ public class expense {
     public List<User> getPaidFor(int expenseID) {
         List<User> paidForUsers = new ArrayList<>();
         String query = "SELECT u.userID, u.username, u.password FROM users u " +
-                "INNER JOIN `expense_users(paidfor)` eup ON u.userID = eup.userID " +
+                "INNER JOIN `expense_users_paidfor` eup ON u.userID = eup.userID " +
                 "WHERE eup.expenseID = ?";
 
         try (Connection conn = DriverManager.getConnection(URL, USERNAME, PASSWORD);

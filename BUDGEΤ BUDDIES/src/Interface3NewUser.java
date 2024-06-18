@@ -135,9 +135,6 @@ public class Interface3NewUser extends JFrame {
         button.setFocusable(false);
     }
 
-    public static void main(String[] args) {
-        new Interface3NewUser();
-    }
 }
 
 class TransparentBackgroundPanel extends JPanel {

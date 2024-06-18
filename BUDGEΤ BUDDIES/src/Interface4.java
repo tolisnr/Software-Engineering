@@ -110,7 +110,7 @@ public class Interface4 extends JFrame {
         backgroundPanel.add(bottomPanel, BorderLayout.SOUTH);
 
         // Set up the frame
-        setTitle("Budget Buddies");
+        setTitle("Budget Buddy");
         setSize(800, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null); // Center the frame

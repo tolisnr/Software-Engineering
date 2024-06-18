@@ -169,9 +169,6 @@ public class Interface2Login extends JFrame {
         button.setFocusable(false);
     }
 
-    public static void main(String[] args) {
-        new Interface2Login();
-    }
 }
 
 class TransparentBackgroundPanel extends JPanel {
