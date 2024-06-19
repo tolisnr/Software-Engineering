@@ -45,7 +45,14 @@ public class Interface10AExpense extends JFrame {
             // Create JList and JScrollPane
             paidForList = new JList<>(paidForUsernames);
             paidForList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION); // Adjust selection mode as needed
+
+            // Set the number of visible rows
+            //paidForList.setVisibleRowCount(10); // Adjust the number as needed
+
             JScrollPane scrollPane = new JScrollPane(paidForList);
+
+            // Set the minimum size of the JScrollPane
+            //scrollPane.setMinimumSize(new Dimension(400, 200)); // Adjust the dimensions as needed
 
 
             // Buttons Appearance
@@ -65,6 +72,10 @@ public class Interface10AExpense extends JFrame {
             BACK.setBounds(10, 10, 80, 30);
             layeredPane.add(BACK, JLayeredPane.PALETTE_LAYER);
 
+            //Add the DELETE button to the top right corner of the layered pane
+            DELETE.setBounds(700, 10, 80, 30);
+            layeredPane.add(DELETE, JLayeredPane.PALETTE_LAYER);
+
             // Create a panel to hold the expense details
             JPanel expensePanel = new JPanel();
             expensePanel.setOpaque(false); // Make panel transparent
@@ -74,7 +85,6 @@ public class Interface10AExpense extends JFrame {
             expensePanel.add(date);
             expensePanel.add(payer);
             expensePanel.add(paidForLabel);
-            expensePanel.add(scrollPane);
 
 
             // Add the expense panel to the layered pane
@@ -86,12 +96,16 @@ public class Interface10AExpense extends JFrame {
             buttonPanel.setOpaque(false); // Make button panel transparent
             buttonPanel.setLayout(new FlowLayout(FlowLayout.CENTER)); // Center buttons
             buttonPanel.add(EDIT);
-            buttonPanel.add(DELETE);
+            //buttonPanel.add(DELETE);
 
 
             // Add the button panel to the layered pane
             buttonPanel.setBounds(300, 500, 200, 50);
             layeredPane.add(buttonPanel, JLayeredPane.PALETTE_LAYER);
+
+            // Add the list panel to the layered pane
+            scrollPane.setBounds(300, 290, 200, 200);
+            layeredPane.add(scrollPane, JLayeredPane.PALETTE_LAYER);
             
     
             BACK.addActionListener(new ActionListener() {
