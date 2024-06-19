@@ -7,7 +7,7 @@ public class Interface6CreateTeam extends JFrame{
 
 	private JLabel titleText = new JLabel("Δώστε το τίτλο της ομάδας: ");
 	private JTextField titleField = new JTextField();
-	private JLabel categoryText = new JLabel("Δώστε την κατηγορία: ");
+	private JLabel categoryText = new JLabel("Δώστε την κατηγορία: (Προαιρετικό)");
 	private JTextField categoryField = new JTextField();
 	private JButton Save = new JButton("SAVE");
 	private JButton BACK = new JButton("BACK");
@@ -30,6 +30,8 @@ public class Interface6CreateTeam extends JFrame{
 		detailsPanel.setLayout(new GridLayout(3, 2, 10, 10)); // Grid layout for the labels and text fields
 
 		titleField.setPreferredSize(new Dimension(200, 30));
+		titleText.setText("<html>" + titleText.getText() + "</html>");
+		categoryText.setText("<html>" + categoryText.getText() + "</html>");
 		categoryField.setPreferredSize(new Dimension(200, 30));
 
 		detailsPanel.add(titleText);
