@@ -1,6 +1,9 @@
-# Software-Engineering
+# Budget Buddy Project
 Software Engineering project for the course "Software Engineering"
+<ul>
+<li>Download the "BUDGET BUDDY.zip" file <br></li>
+<li>Unzip the folder <br></li>
+<li>Run the "run.bat" file <br></li>
+</ul>
 
-Download the libraries from "https://gluonhq.com/products/javafx/" <br>
-Unzip the folder <br>
-Copy the lib folder into the lib folder of the JavaFX project <br>
+<strong>Make sure you have installed XAMPP and created the budgetbuddy database</strong>
